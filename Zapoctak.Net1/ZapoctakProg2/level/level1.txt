@@ -1,0 +1,46 @@
+#!Make sure to use "," for decimal point!
+#
+#number of planets
+5
+#planet stats 
+#x   y  xvel yvel radius type
+420 350 0 22 15 0
+720 350 0 18 18 0
+170 350 0 -16 14 0
+920 350 0 11 11 0
+540 290 0 13 13 0
+#number of suns
+2
+#sun stats
+#x y xvel yvel radius temperature mass
+340 430 0 0 45 2500 5500
+660 390 0 0 38 7500 5200
+#number of powerups
+1
+#powerUp stats
+#type
+#x y xvel yvel radius
+#additional info
+ReduceTime
+500 500 0 0 14
+5
+#gravity constant
+700
+#maxdistance
+360
+#minimum gravity
+300
+#maximum gravity
+1200
+#graphics scale factor
+0,9
+#time limit (seconds)
+20
+#number of lose conditions
+1
+#lose conditions
+tooFewGoodPlanets
+2
+#nextlevel filename
+level2.txt
+#level description

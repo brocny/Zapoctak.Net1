@@ -34,8 +34,9 @@ namespace ZapoctakProg2
         public TooManyBadPlanets(int maxNumber, int[] PlanetTypeCount) : base(maxNumber, PlanetTypeCount) { }
         public override void Check()
         {
-            if (PlanetTypeCount[(int)Planet.PlanetType.Bad] > minmaxNumber)
-                throw new RequirementsNotMetException(string.Format("Too many Bad planets - maximum of {0} required", minmaxNumber));
+            var actualCount = PlanetTypeCount[(int) Planet.PlanetType.Bad];
+            if (actualCount > minmaxNumber)
+                throw new RequirementsNotMetException($"Too many Bad planets - maximum of {minmaxNumber} required, {actualCount} present");
         }
         public override string ToString()
         {

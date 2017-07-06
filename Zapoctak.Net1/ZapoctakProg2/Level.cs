@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Diagnostics;
+using System.Linq;
 
 namespace ZapoctakProg2
 {
@@ -205,10 +206,9 @@ namespace ZapoctakProg2
 
         private void UpdatePlanetCountType()
         {
-            for (var i = 0; i < planetTypeCount.Length; i++)
-                planetTypeCount[i]++;
+            planetTypeCount.Initialize();
 
-            foreach (var planet in planets)
+            foreach (var planet in planets.Where(p => !p.IsDestroyed))
                 planetTypeCount[(int)planet.planetType]++;
         }
 

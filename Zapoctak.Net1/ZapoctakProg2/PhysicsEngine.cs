@@ -8,7 +8,7 @@ namespace ZapoctakProg2
 {
     public class PhysicsEngine
     {
-        public PhysicsEngine(int gravityConst, int minGravity, int maxGravity, double maxDistance, Level level)
+        public PhysicsEngine(int gravityConst, int minGravity, int maxGravity, double _maxSafeDistance, Level level)
         {
             this.minGravity = minGravity;
             this.maxGravity = maxGravity;
@@ -17,7 +17,7 @@ namespace ZapoctakProg2
             this.suns = level.Suns;
             this.planets = level.Planets;
             this.powerUps = level.PowerUps;
-            this.maxDistance = maxDistance;
+            this.maxSafeDistance = _maxSafeDistance;
         }
 
         private List<Planet> planets;
@@ -25,8 +25,12 @@ namespace ZapoctakProg2
         private List<PowerUp> powerUps;
         private Level level;
 
-        private double maxDistance;
-        public double MaxDistance => maxDistance;
+        private double maxSafeDistance;
+        public double MaxSafeDistance
+        {
+            get { return maxSafeDistance; }
+            set { maxSafeDistance = value; }
+        }
 
         private int maxGravity;
         public int MaxGravity => maxGravity;
@@ -116,7 +120,7 @@ namespace ZapoctakProg2
                 foreach (var sun in suns)
                 {
                     if(sun.IsDestroyed) continue;
-                    if (planets[i].DistanceTo(sun) <= maxDistance)
+                    if (planets[i].DistanceTo(sun) <= maxSafeDistance)
                         numSunsCloseEnough++;
                 }
                 if (numSunsCloseEnough == 0)
@@ -133,7 +137,7 @@ namespace ZapoctakProg2
                 foreach (var sun in suns)
                 {
                     if(sun.IsDestroyed) continue;
-                    if (powerUps[i].DistanceTo(sun) <= maxDistance)
+                    if (powerUps[i].DistanceTo(sun) <= maxSafeDistance)
                         numSunsCloseEnough++;
                 }
                 if (numSunsCloseEnough == 0)
@@ -217,6 +221,7 @@ namespace ZapoctakProg2
                     if (powerUp.HasCrashedWith(powerUps[j]))
                     {
                         powerUp.ApplyPowerup(level, powerUps[j]);
+                        powerUps[j].ApplyPowerup(level, powerUp);
                         powerUp.IsDestroyed = true;
                         goto Next;
                     }

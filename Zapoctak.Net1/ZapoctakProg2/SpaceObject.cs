@@ -113,7 +113,11 @@ namespace ZapoctakProg2
             yPos += yVel / SlowdownFactor;
         }
 
-
-
+        protected void DrawVelocityArrowFromCentre(Graphics gr, double scaleFactor, float arrowSize, Pen pen)
+        {
+            var startPoint = new PointF((float)(xPos * scaleFactor), (float)(yPos * scaleFactor));
+            var endPoint = new PointF((float)((xPos + arrowSize * xVel) * scaleFactor), (float)((yPos + arrowSize * yVel) * scaleFactor));
+            gr.DrawLine(pen, startPoint, endPoint);
+        }
     }
 }

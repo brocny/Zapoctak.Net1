@@ -11,10 +11,14 @@ namespace ZapoctakProg2
 {
     public class Level
     {
+        // path to directory containing levels
         public const string LevelPath = @"..\..\level\";
         public const string Firstlevelpath = LevelPath + @"level1.txt";
 
+        public const string WinMessage = "Congratulations, You Win!";
+
         private GraphicsEngine graphics;
+        public GraphicsEngine Graphics => graphics;
 
         private PhysicsEngine physics;
         public PhysicsEngine Physics => physics;
@@ -24,19 +28,30 @@ namespace ZapoctakProg2
 
         //levels create a two-way linked list
         private Level nextLevel;
+        /// <returns>The Next Level, <code>null</code> if no next level available</returns>
+        /// <remarks>Lazy creation</remarks>
+        public Level NextLevel
+        {
+            get
+            {
+                if (nextLevelPath == null)
+                    return null;
+
+                return nextLevel ?? (nextLevel = new Level(formInteraction, this, nextLevelPath));
+            }
+        }
+
         private Level previousLevel;
+        public Level PreviousLevel => previousLevel;
+
+
+
 
         //the file in which the next level is saved
         private string nextLevelPath;
 
         //the file in which the current level is saved
-        private string currentPath;
-
-        public int Gravity
-        {
-            set { physics.GravityConst = value; }
-            get { return physics.GravityConst; }
-        }
+        private readonly string currentPath;
 
         private List<Sun> suns;
         public List<Sun> Suns => suns;
@@ -47,12 +62,11 @@ namespace ZapoctakProg2
         private List<PowerUp> powerUps;
         public List<PowerUp> PowerUps => powerUps;
 
-        private int planetCount;
+        private int[] planetCountByType = { 0, 0, 0 };
+        public int[] PlanetCountByType => planetCountByType;
 
-        private int[] planetTypeCount = { 0, 0, 0 };
-        public int[] PlanetTypeCount => planetTypeCount; 
-
-        private List<LoseCondition> loseConditions;
+        private List<Func<Level, bool>> winConditions;
+        public List<Func<Level, bool>> WinConditions;
 
         private int timeLimit;
         public int TimeLimit
@@ -63,10 +77,8 @@ namespace ZapoctakProg2
 
         private Stopwatch stopwatch;
 
-
-
         //displayed at the end of the level - if player lost, it tells him why
-        private string endLevelMessage = "You Lose: \n";
+        private string endLevelMessage = "Sorry, You Lose";
         public string EndLevelMessage => endLevelMessage;
 
         //displayed at the start of the level - tells the player what he needs to do
@@ -97,9 +109,9 @@ namespace ZapoctakProg2
         {
             suns = new List<Sun>();
             planets = new List<Planet>();
-            loseConditions = new List<LoseCondition>();
+            winConditions = new List<Func<Level, bool>>();
             stopwatch = new Stopwatch();
-            planetTypeCount = new[] { 0, 0, 0 };
+            planetCountByType = new[] { 0, 0, 0 };
 
             ReadLevelInput();
         }
@@ -184,32 +196,24 @@ namespace ZapoctakProg2
         //level is won if no lose condition is met
         public bool CheckVictory()
         {
-            var victory = true;
-
             UpdatePlanetCountType();
 
-            foreach (var cond in loseConditions)
+            foreach (var winCondition in winConditions)
             {
-                try
+                if (!winCondition.Invoke(this))
                 {
-                    cond.Check();
-                }
-                catch (RequirementsNotMetException excep)
-                {
-                    endLevelMessage += excep.Message + "\n";
-                    victory = false;
+                    return false;
                 }
             }
-                
-            return victory;
+            return true;
         }
 
         private void UpdatePlanetCountType()
         {
-            planetTypeCount.Initialize();
+            planetCountByType.Initialize();
 
             foreach (var planet in planets.Where(p => !p.IsDestroyed))
-                planetTypeCount[(int)planet.planetType]++;
+                planetCountByType[(int)planet.Type]++;
         }
 
 
@@ -226,45 +230,17 @@ namespace ZapoctakProg2
                 physics = inputReader.ReadPhysicsEngine();
                 graphics = inputReader.ReadGraphicsEngine();
                 timeLimit = inputReader.ReadTimeLimit();
-                loseConditions = inputReader.ReadLoseConditions();
+                var conditions = inputReader.ReadWinConditions();
+                winConditions = conditions.Item1;
+                description = conditions.Item2;
                 nextLevelPath = inputReader.ReadNextLevelPath();
-                description = GenerateDescription() + inputReader.ReadDescription();
+                description = description + inputReader.ReadDescription();
             }
             catch (IOException)
             {
                 description = "Error loading level: Invalid input file format!";
             }
-            
         }
-        
-
-        //generates the string stating level requirements from previously read input
-        private string GenerateDescription()
-        {
-            var descriptionbuilder = new StringBuilder("Level requirements: \n");
-            foreach (var cond in loseConditions)
-                descriptionbuilder.AppendLine(cond.ToString());
-            return descriptionbuilder.ToString();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>The Next Level, <code>null</code> if no next level available</returns>
-        /// <remarks>Lazy creation</remarks>
-        public Level NextLevel
-        {
-            get
-            {
-                if (nextLevelPath == null)
-                    return null;
-
-                return nextLevel ?? (nextLevel = new Level(formInteraction, this, nextLevelPath));
-            }
-        }
-
-        public Level PreviousLevel => previousLevel;
     }
 
 
@@ -363,6 +339,10 @@ namespace ZapoctakProg2
                 {
                     powerUps.Add(parser.Parse(this));
                 }
+                else
+                {
+                    throw new FormatException($"Unknown PowerUp id {powerUpId}");
+                }
             }
 
             return powerUps;
@@ -378,29 +358,22 @@ namespace ZapoctakProg2
             return coords;
     }
 
-    public List<LoseCondition> ReadLoseConditions()
+        public (List<Func<Level, bool>>, string) ReadWinConditions()
         {
-            var loseConditions = new List<LoseCondition>();
-            var numLoseCondition = int.Parse(ReadLine());
-            for (var i = 0; i < numLoseCondition; i++)
+            var numConditions = int.Parse(ReadLine());
+            var winConditions = new List<Func<Level, bool>>(numConditions);
+
+            var descriptionBuilder = new StringBuilder("Level requirements: \n");
+
+            for (int i = 0; i < numConditions; i++)
             {
-                switch (ReadLine())
-                {
-                    case "tooFewGoodPlanets":
-                        var minGoodPlanets = int.Parse(reader.ReadLine());
-                        loseConditions.Add(new TooFewGoodPlanets(minGoodPlanets, level.PlanetTypeCount));
-                        break;
-                    case "tooManyBadPlanets":
-                        var maxBadPlanets = int.Parse(reader.ReadLine());
-                        loseConditions.Add(new TooManyBadPlanets(maxBadPlanets, level.PlanetTypeCount));
-                        break;
-                    case "tooFewTotalPlanets":
-                        var minTotalPlanets = int.Parse(reader.ReadLine());
-                        loseConditions.Add(new TooFewTotalPlanets(minTotalPlanets, level.PlanetTypeCount));
-                        break;
-                }
+                var line = ReadLine();
+                var parsedExpression = ExpressionParser.Parse(line);
+                winConditions.Add(parsedExpression);
+                descriptionBuilder.AppendLine(ReadLine());
             }
-            return loseConditions;
+
+            return (winConditions, descriptionBuilder.ToString());
         }
 
         public string ReadDescription()

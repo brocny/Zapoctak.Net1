@@ -40,8 +40,9 @@ namespace ZapoctakProg2
         {
             if(!Directory.Exists(path)) return;
             var files = from file in Directory.EnumerateFiles(path)
-                where Regex.IsMatch(file, @".*PowerUp.*\.dll$")
-                select file;
+                where Regex.IsMatch(file, @".*Powerup.*\.dll$")
+                select Path.GetFullPath(file);
+
             foreach (var file in files)
             {
                 var assembly = Assembly.LoadFile(file);
@@ -58,8 +59,6 @@ namespace ZapoctakProg2
                 {
                     Register(instance.PowerUpId, instance);
                 }
-                
-
             }
         }
     }

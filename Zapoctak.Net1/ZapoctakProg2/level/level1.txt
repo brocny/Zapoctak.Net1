@@ -16,14 +16,17 @@
 340 430 0 0 45 2500 5500
 660 390 0 0 38 7500 5200
 #number of powerups
-1
+2
 #powerUp stats
 #type
 #x y xvel yvel radius
 #additional info
 ReduceTime
-500 500 0 0 14
+500 500 4 -19 14
 5
+ExtendSafeZone
+440 400 -2 16 16
+1,2
 #gravity constant
 700
 #maxdistance
@@ -39,8 +42,8 @@ ReduceTime
 #number of lose conditions
 1
 #lose conditions
-tooFewGoodPlanets
-2
+level => level.PlanetCountByType[Good] >= 2
+Minimum Good planets: 2
 #nextlevel filename
 level2.txt
 #level description

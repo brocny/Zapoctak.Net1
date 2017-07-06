@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace ZapoctakProg2
 {
@@ -10,11 +11,25 @@ namespace ZapoctakProg2
             Good, Neutral, Bad
         }
 
+        public PlanetType Type { get; }
+
+        private readonly Brush brush;
+        private readonly Color color;
+
+        private static readonly Pen VelocityPen = new Pen(Color.White, 3f);
+        
+        public const double MinimumRadius = 1;
+
+        static Planet()
+        {
+            VelocityPen.EndCap = LineCap.ArrowAnchor;
+        }
+        
         public Planet(double xPos, double yPos, double xVel, double yVel, double radius, PlanetType type) : base(xPos, yPos, xVel, yVel, radius)
         {
-            planetType = type;
+            Type = type;
 
-            switch (planetType)
+            switch (Type)
             {
                 case PlanetType.Bad:
                     color = Color.FromArgb(255, 0, 0);
@@ -28,17 +43,8 @@ namespace ZapoctakProg2
             }
 
             brush = new SolidBrush(color);
-            velocityPen.EndCap = System.Drawing.Drawing2D.LineCap.ArrowAnchor;
         }
-        public PlanetType planetType;
-
-        private Brush brush;
-        private Color color;
-
-        private Pen velocityPen = new Pen(Color.White, 3f);
-
-
-        public const double MinimumRadius = 1;
+        
 
         //shrinks the planets radius if it is too close to the given Sun
         public void ApplyBurns(Sun sun)
@@ -56,9 +62,7 @@ namespace ZapoctakProg2
         {
             gr.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
-
-            gr.DrawLine(velocityPen, (float)(xPos * scaleFactor), (float)(yPos * scaleFactor),
-                (float)((xPos + ArrowSize * xVel) * scaleFactor), (float)((yPos + ArrowSize * yVel) * scaleFactor));
+            DrawVelocityArrowFromCentre(gr, scaleFactor, ArrowSize, VelocityPen);
         }
 
     }

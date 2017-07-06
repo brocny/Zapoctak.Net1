@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +44,6 @@ namespace ZapoctakProg2
         /// <summary>
         /// Will be called after the time has run out
         /// </summary>
-        /// <param name="level"></param>
         public abstract void ApplyTimeOver(Level level);
 
     }
@@ -51,54 +51,66 @@ namespace ZapoctakProg2
 
     public class ReduceTimePowerUp : PowerUp
     {
-        private int amount;
-        private Font font;
-        private Pen pen = new Pen(Color.GreenYellow);
-        private Brush textBrush = new SolidBrush(Color.Black);
+        private readonly int reduceAmount;
+        private static readonly Font Font = new Font(FontFamily.GenericSansSerif, 9f);
+        private static readonly Pen CircumferencePen = new Pen(Color.GreenYellow, 2f);
+        private static readonly Pen VelocityPen = new Pen(Color.GreenYellow, 2f) {EndCap = LineCap.ArrowAnchor};
+        private static readonly Brush TextBrush = new SolidBrush(Color.GreenYellow);
 
-        public ReduceTimePowerUp(double xPos, double yPos, double xVel, double yVel, double radius, int amount) : base (xPos, yPos, xVel, yVel, radius)
+        public ReduceTimePowerUp(double xPos, double yPos, double xVel, double yVel, double radius, int reduceAmount) : base (xPos, yPos, xVel, yVel, radius)
         {
-            this.amount = amount;
-            font = new Font(FontFamily.GenericSansSerif, (float)radius / 1.5f);
+            this.reduceAmount = reduceAmount;
         }
 
-        public ReduceTimePowerUp(Coordinates coords, int amount) : base(coords)
+        public ReduceTimePowerUp(Coordinates coords, int reduceAmount) : base(coords)
         {
-            this.amount = amount;
-            font = new Font(FontFamily.GenericSansSerif, (float) radius / 1.5f);
+            this.reduceAmount = reduceAmount;
         }
 
         public override void Draw(Graphics gr, double scaleFactor)
         {
-            gr.DrawEllipse(pen, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            gr.DrawEllipse(CircumferencePen, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            gr.DrawString($"-{amount}", font, textBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
+            gr.DrawString($"-{reduceAmount}", Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
+
+            DrawVelocityArrowFromCentre(gr, scaleFactor, 2, VelocityPen);
         }
 
         public override void ApplyPlanet(Level level, Planet planet)
         {
-            
+            switch (planet.Type)
+            {
+                case Planet.PlanetType.Good:
+                    level.TimeLimit -= reduceAmount;
+                    break;
+                case Planet.PlanetType.Neutral:
+                    break;
+                case Planet.PlanetType.Bad:
+                    level.TimeLimit += reduceAmount;
+                    break;
+            }
         }
 
         public override void ApplySun(Level level, Sun sun)
         {
-            level.TimeLimit -= amount;
+            level.TimeLimit -= reduceAmount;
         }
 
         public override void ApplyPowerup(Level level, PowerUp powerUp)
         {
-            throw new NotImplementedException();
+            if (powerUp.GetType() == typeof(ReduceTimePowerUp))
+            {
+                level.TimeLimit -= (int)Math.Ceiling(1.5 * reduceAmount);
+            }
         }
 
         public override void ApplyTooFar(Level level)
         {
-            throw new NotImplementedException();
         }
         
         public override void ApplyTimeOver(Level level)
-        {
-            
+        {   
         }
     }
 
@@ -113,6 +125,4 @@ namespace ZapoctakProg2
             return new ReduceTimePowerUp(coords, amount);
         }
     }
-
-
 }

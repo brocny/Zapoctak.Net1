@@ -7,22 +7,11 @@ namespace ZapoctakProg2
 {
     public class GraphicsEngine
     {
-        public GraphicsEngine(Level level, double scaleFactor)
-        {
+        // Brush which will be used to draw the survival zone
+        public static Brush SafeZoneBrush { get; } = new SolidBrush(Color.FromArgb(40, 40, 45));
+        //Brush used for the background color - its color the is the dead zone and the Good zone is drawn on top of it
+        public static Brush DeathZoneBrush { get; } = new SolidBrush(Color.FromArgb(60, 10, 10));
 
-            this.pictureBox = level.Form.PictureBox;
-            this.suns = level.Suns;
-            this.planets = level.Planets;
-            this.powerUps = level.PowerUps;
-            this.scaleFactor = scaleFactor;
-            this.maxDistance = level.Physics.MaxDistance;
-            bmp = new Bitmap(pictureBox.Width, pictureBox.Height);
-            gr = Graphics.FromImage(bmp);
-            gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            pictureBox.Image = bmp;
-        }
-
-        
         private Level level;
         private List<Sun> suns;
         private List<Planet> planets;
@@ -30,18 +19,32 @@ namespace ZapoctakProg2
 
         private PictureBox pictureBox;
         private Graphics gr;
-        private Bitmap bmp;
-        public Bitmap Bmp { get { return bmp; } }
+        public Bitmap Bmp { get; }
 
-        private double scaleFactor;
+        public double ScaleFactor { get; set; }
 
-        private double maxDistance;
+        public GraphicsEngine(Level level, double scaleFactor)
+        {
+            this.level = level;
+            this.pictureBox = level.Form.PictureBox;
+            this.suns = level.Suns;
+            this.planets = level.Planets;
+            this.powerUps = level.PowerUps;
+            this.ScaleFactor = scaleFactor;
+            Bmp = new Bitmap(pictureBox.Width, pictureBox.Height);
+            gr = Graphics.FromImage(Bmp);
+            gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            pictureBox.Image = Bmp;
+        }
+
+        
+        
 
         //performs one tick of the graphics - draws everything
         public void Tick()
         {
             ClearScreen();
-            DrawMaxDistance();
+            DrawSafeZone();
             DrawObjects();
         }
 
@@ -50,41 +53,37 @@ namespace ZapoctakProg2
         {
             foreach (var sun in suns.Where(s => !s.IsDestroyed))
             {
-                sun.Draw(gr, scaleFactor);
+                sun.Draw(gr, ScaleFactor);
             }
 
             foreach (var planet in planets.Where(p => !p.IsDestroyed))
             {
-                planet.Draw(gr, scaleFactor);
+                planet.Draw(gr, ScaleFactor);
             }
 
             foreach (var powerUp in powerUps.Where(p => !p.IsDestroyed))
             {
-                powerUp.Draw(gr, scaleFactor);
+                powerUp.Draw(gr, ScaleFactor);
             }
 
             pictureBox.Refresh();
         }
 
-        // Brush which will be used to draw the survival zone
-        private Brush distBrush = new SolidBrush(Color.FromArgb(50, 50, 50));
+       
 
         /// <summary>
         /// Draw the zone in which planets can survive
         /// </summary>
-        private void DrawMaxDistance()
+        private void DrawSafeZone()
         {
             foreach (var sun in suns)
-                gr.FillEllipse(distBrush, (float)((sun.XPos - maxDistance) * scaleFactor), (float)((sun.YPos - maxDistance) * scaleFactor),
-                    2 * (float)(maxDistance * scaleFactor), 2 * (float)(maxDistance * scaleFactor));
+                gr.FillEllipse(SafeZoneBrush, (float)((sun.XPos - level.Physics.MaxSafeDistance) * ScaleFactor), (float)((sun.YPos - level.Physics.MaxSafeDistance) * ScaleFactor),
+                    2 * (float)(level.Physics.MaxSafeDistance * ScaleFactor), 2 * (float)(level.Physics.MaxSafeDistance * ScaleFactor));
         }
-
-        //Brush used for the background color - its color the is the dead zone and the Good zone is drawn on top of it
-        private Brush whiteBrush = new SolidBrush(Color.FromArgb(60, 45, 45));
 
         private void ClearScreen()
         {
-            gr.FillRectangle(whiteBrush, new Rectangle(0, 0, bmp.Width, bmp.Height));
+            gr.FillRectangle(DeathZoneBrush, new Rectangle(0, 0, Bmp.Width, Bmp.Height));
         }
     }
 }

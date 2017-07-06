@@ -79,11 +79,11 @@ namespace ZapoctakProg2
         {
             Parallel.ForEach(planets, p => 
             {
-                if (!p.IsDestroyed) p.UpdatePos();
+                if (!p.IsDestroyed) p.UpdatePosition();
             });
             Parallel.ForEach(powerUps, p =>
             {
-                if (!p.IsDestroyed) p.UpdatePos();
+                if (!p.IsDestroyed) p.UpdatePosition();
             });
         }
 
@@ -99,12 +99,13 @@ namespace ZapoctakProg2
                         if (!p.IsDestroyed)
                         {
                             p.ApplyBurns(sun);
-                            p.UpdateVel(sun, gravityConst);
+                            p.UpdateVelocity(sun, gravityConst);
                         }
                     });
                 Parallel.ForEach(powerUps,
                     p => {
-                        if(!p.IsDestroyed) p.UpdateVel(sun, gravityConst);
+                        if(!p.IsDestroyed)
+                            p.UpdateVelocity(sun, gravityConst);
                     });
             }
         }

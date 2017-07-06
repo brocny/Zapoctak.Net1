@@ -3,13 +3,6 @@ using System.Drawing;
 
 namespace ZapoctakProg2
 {
-    #region SpaceObject
-
-    public interface IDrawable
-    {
-        void Draw(Graphics gr, double scaleFactor);
-    }
-
     public struct Coordinates
     {
         private double xPos, yPos, xVel, yVel, radius;
@@ -29,7 +22,7 @@ namespace ZapoctakProg2
         }
     }
 
-    public abstract class SpaceObject : IDrawable
+    public abstract class SpaceObject
     {
         public const int SlowdownFactor = 20;
         public const int GravityReductionFactor = 100;
@@ -80,7 +73,6 @@ namespace ZapoctakProg2
         public abstract void Draw(Graphics gr, double scaleFactor);
 
     }
-    #endregion
 
     public abstract class MovingSpaceObject : SpaceObject
     {
@@ -93,7 +85,13 @@ namespace ZapoctakProg2
 
         public abstract override void Draw(Graphics gr, double scaleFactor);
 
-        public void UpdateVel(Sun sun, double gravityConst)
+        public void UpdatePosition()
+        {
+            xPos += xVel / SlowdownFactor;
+            yPos += yVel / SlowdownFactor;
+        }
+
+        public void UpdateVelocity(Sun sun, double gravityConst)
         {
             var sunDistance = DistanceTo(sun);
             var sunDistance3 = sunDistance * sunDistance * sunDistance;
@@ -107,11 +105,7 @@ namespace ZapoctakProg2
             return DistanceTo(withObject) < radius + withObject.Radius;
         }
 
-        public void UpdatePos()
-        {
-            xPos += xVel / SlowdownFactor;
-            yPos += yVel / SlowdownFactor;
-        }
+        
 
         protected void DrawVelocityArrowFromCentre(Graphics gr, double scaleFactor, float arrowSize, Pen pen)
         {

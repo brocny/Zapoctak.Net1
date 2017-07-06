@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ZapoctakProg2
 {
@@ -26,7 +26,7 @@ namespace ZapoctakProg2
         private FormInteraction formInteraction;
         public FormInteraction Form => formInteraction;
 
-        //levels create a two-way linked list
+        // levels are stored in a two-way linked list
         private Level nextLevel;
         /// <returns>The Next Level, <code>null</code> if no next level available</returns>
         /// <remarks>Lazy creation</remarks>
@@ -44,10 +44,9 @@ namespace ZapoctakProg2
         private Level previousLevel;
         public Level PreviousLevel => previousLevel;
 
-
-
-
-        //the file in which the next level is saved
+        /// <summary>
+        /// Path to file containing information about the next level
+        /// </summary>
         private string nextLevelPath;
 
         //the file in which the current level is saved
@@ -63,10 +62,13 @@ namespace ZapoctakProg2
         public List<PowerUp> PowerUps => powerUps;
 
         private int[] planetCountByType = { 0, 0, 0 };
+        /// <summary>
+        /// Index using <code>Planet.PlanetType</code>
+        /// </summary>
         public int[] PlanetCountByType => planetCountByType;
 
         private List<Func<Level, bool>> winConditions;
-        public List<Func<Level, bool>> WinConditions;
+        public List<Func<Level, bool>> WinConditions => winConditions;
 
         private int timeLimit;
         public int TimeLimit
@@ -76,14 +78,20 @@ namespace ZapoctakProg2
         }
 
         private Stopwatch stopwatch;
+        public Stopwatch Stopwatch => stopwatch;
 
-        //displayed at the end of the level - if player lost, it tells him why
-        private string endLevelMessage = "Sorry, You Lose";
-        public string EndLevelMessage => endLevelMessage;
+        /// <summary>
+        /// Displayed after the end of the level if player lost
+        /// </summary>
+        private string loseMessage = "Sorry, You Lose - Failed Requirements: ";
+        public string LoseMessage => loseMessage;
 
-        //displayed at the start of the level - tells the player what he needs to do
-        private string description;
-        public string Description => description;
+        /// <summary>
+        /// Shown at the top - used to display level objectives and/or any additional info
+        /// </summary>
+        public string Description { get; internal set; }
+
+        private string[] goalDescriptions;
 
         public bool IsFirstLevel => previousLevel == null;
         public bool IsLastLevel => nextLevelPath == null;
@@ -192,23 +200,30 @@ namespace ZapoctakProg2
         
 
 
-        //returns whether the victory requirements for this level are met
-        //level is won if no lose condition is met
+        /// <summary>
+        /// Check whether all win conditions are met
+        /// </summary>
+        /// <returns>True if all win conditions are met</returns>
         public bool CheckVictory()
         {
-            UpdatePlanetCountType();
-
-            foreach (var winCondition in winConditions)
+            UpdatePlanetCountByType();
+            var victory = true;
+            for (var i = 0; i < winConditions.Count; i++)
             {
+                var winCondition = winConditions[i];
                 if (!winCondition.Invoke(this))
                 {
-                    return false;
+                    victory = false;
+                    loseMessage += "\n" + goalDescriptions[i];
                 }
             }
-            return true;
+            return victory;
         }
 
-        private void UpdatePlanetCountType()
+        /// <summary>
+        /// Update <code>PlanetCountByType</code> to contain the number of planets of each type that are not destroyed
+        /// </summary>
+        private void UpdatePlanetCountByType()
         {
             planetCountByType.Initialize();
 
@@ -217,7 +232,9 @@ namespace ZapoctakProg2
         }
 
 
-        //Loads level info from input text file
+        /// <summary>
+        /// Load level information from <code>currentPath</code>
+        /// </summary>
         private void ReadLevelInput()
         {
             var reader = new StreamReader(currentPath);
@@ -232,177 +249,17 @@ namespace ZapoctakProg2
                 timeLimit = inputReader.ReadTimeLimit();
                 var conditions = inputReader.ReadWinConditions();
                 winConditions = conditions.Item1;
-                description = conditions.Item2;
+                goalDescriptions = conditions.Item2;
                 nextLevelPath = inputReader.ReadNextLevelPath();
-                description = description + inputReader.ReadDescription();
+                Description = Description + inputReader.ReadDescription();
             }
             catch (IOException)
             {
-                description = "Error loading level: Invalid input file format!";
+                Description = "Error loading level: Invalid input file format!";
             }
         }
     }
 
-
-
-    public class LevelInputReader
-    {
-        private StreamReader reader;
-        private Level level;
-
-        
-
-        public LevelInputReader(StreamReader reader, Level level)
-        {
-            this.reader = reader;
-            this.level = level;
-        }
-
-        public List<Sun> ReadSuns()
-        {
-            var numSuns = int.Parse(ReadLine());
-            var suns = new List<Sun>();
-
-            for (var i = 0; i < numSuns; i++)
-            {
-                var sunLine = ReadLine();
-                var s = sunLine.Split();
-
-                suns.Add(new Sun(double.Parse(s[0]), double.Parse(s[1]), double.Parse(s[2]), double.Parse(s[3]),
-                    double.Parse(s[4]), double.Parse(s[5]), double.Parse(s[6])));
-            }
-
-            return suns;
-        }
-
-        public List<Planet> ReadPlanets()
-        {
-            var numPlanets = int.Parse(ReadLine());
-            var planets = new List<Planet>();
-
-            for (var i = 0; i < numPlanets; i++)
-            {
-                var planetLine = ReadLine();
-                var p = planetLine.Split();
-
-                planets.Add(new Planet(double.Parse(p[0]), double.Parse(p[1]), double.Parse(p[2]), double.Parse(p[3]),
-                    double.Parse(p[4]), (Planet.PlanetType)int.Parse(p[5])));
-            }
-            return planets;
-        }
-
-        public string ReadNextLevelPath()
-        {
-            var nextLevelName = ReadLine();
-            string nextLevelPath = Level.LevelPath + nextLevelName;
-            if (nextLevelName?.ToLower() == "null" || !File.Exists(nextLevelPath))
-            {
-                return null;
-            }
-
-            return nextLevelPath;
-        }
-
-        public GraphicsEngine ReadGraphicsEngine()
-        {
-            var scaleFactor = double.Parse(ReadLine());
-            return new GraphicsEngine(level, scaleFactor);
-        }
-
-        public PhysicsEngine ReadPhysicsEngine()
-        {
-            var gravityConst = int.Parse(ReadLine());
-            var maxDistance = double.Parse(ReadLine());
-
-            var minGravity = int.Parse(ReadLine());
-            var maxGravity = int.Parse(ReadLine());
-
-            var physics = new PhysicsEngine(gravityConst, minGravity, maxGravity, maxDistance, level);
-            return physics;
-        }
-
-        public int ReadTimeLimit()
-        {
-            return int.Parse(ReadLine());
-        }
-
-        public List<PowerUp> ReadPowerUps()
-        {
-            var numPowerUps = int.Parse(ReadLine());
-            var powerUps = new List<PowerUp>();
-            var parsers = PowerUpPluginLoader.Instance.Parsers;
-
-            for (int i = 0; i < numPowerUps; i++)
-            {
-                var powerUpId = ReadLine();
-                if (parsers.TryGetValue(powerUpId, out IPowerUpParser parser))
-                {
-                    powerUps.Add(parser.Parse(this));
-                }
-                else
-                {
-                    throw new FormatException($"Unknown PowerUp id {powerUpId}");
-                }
-            }
-
-            return powerUps;
-        }
-
-    public Coordinates ReadCoordinates()
-    {
-        var coordStrings = ReadLine().Split(' ');
-
-        var coords = new Coordinates(double.Parse(coordStrings[0]), double.Parse(coordStrings[1]),
-                double.Parse(coordStrings[2]),
-                double.Parse(coordStrings[3]), double.Parse(coordStrings[4]));
-            return coords;
-    }
-
-        public (List<Func<Level, bool>>, string) ReadWinConditions()
-        {
-            var numConditions = int.Parse(ReadLine());
-            var winConditions = new List<Func<Level, bool>>(numConditions);
-
-            var descriptionBuilder = new StringBuilder("Level requirements: \n");
-
-            for (int i = 0; i < numConditions; i++)
-            {
-                var line = ReadLine();
-                var parsedExpression = ExpressionParser.Parse(line);
-                winConditions.Add(parsedExpression);
-                descriptionBuilder.AppendLine(ReadLine());
-            }
-
-            return (winConditions, descriptionBuilder.ToString());
-        }
-
-        public string ReadDescription()
-        {
-            var descBuilder = new StringBuilder();
-            while (!reader.EndOfStream)
-            {
-                var line = ReadLine();
-                if (line != null)
-                    descBuilder.AppendLine(line);
-            }
-            return descBuilder.ToString();
-    }
-
-        public string ReadLine()
-        {
-            string line;
-            do
-            {
-                line = reader.ReadLine();
-            }
-            while (line?[0] == '#' && !reader.EndOfStream);
-
-            if (line?[0] == '#') return string.Empty;
-
-            return line;
-        }
-
-    }
 
     public class FormInteraction
     {

@@ -93,19 +93,15 @@ namespace ZapoctakProg2
             {
                 if (sun.IsDestroyed) continue;
 
-                Parallel.ForEach(planets,
+                Parallel.ForEach(from powerUp in powerUps where !powerUp.IsDestroyed select powerUp,
                     p =>
                     {
-                        if (!p.IsDestroyed)
-                        {
-                            p.ApplyBurns(sun);
                             p.UpdateVelocity(sun, gravityConst);
-                        }
                     });
-                Parallel.ForEach(powerUps,
+                Parallel.ForEach(from planet in planets where !planet.IsDestroyed select planet,
                     p => {
-                        if(!p.IsDestroyed)
-                            p.UpdateVelocity(sun, gravityConst);
+                        p.ApplyBurns(sun);
+                        p.UpdateVelocity(sun, gravityConst);
                     });
             }
         }
@@ -128,7 +124,6 @@ namespace ZapoctakProg2
                 {
                     planets[i].IsDestroyed = true;
                 }
-
             }
 
             for (int i = 0; i < powerUps.Count; i++)
@@ -161,7 +156,7 @@ namespace ZapoctakProg2
             {
                 foreach (var sun in suns)
                 {
-                    if (planets[i].HasCrashedWith(sun))
+                    if (planets[i].HasCollidedWith(sun))
                     {
                         planets[i].IsDestroyed = true;
                         break;
@@ -178,7 +173,7 @@ namespace ZapoctakProg2
                 {
                     if (planets[j].IsDestroyed) continue;
                     
-                    if (planets[i].HasCrashedWith(planets[j]))
+                    if (planets[i].HasCollidedWith(planets[j]))
                     {
                         planets[i].IsDestroyed = true;
                         planets[j].IsDestroyed = true;
@@ -197,7 +192,7 @@ namespace ZapoctakProg2
                 foreach (Sun sun in suns)
                 {
                     if (sun.IsDestroyed) continue;
-                    if (powerUp.HasCrashedWith(sun))
+                    if (powerUp.HasCollidedWith(sun))
                     {
                         powerUp.ApplySun(level, sun);
                         powerUp.IsDestroyed = true;
@@ -208,7 +203,7 @@ namespace ZapoctakProg2
                 foreach (Planet planet in planets)
                 {
                     if (planet.IsDestroyed) continue;
-                    if (powerUp.HasCrashedWith(planet))
+                    if (powerUp.HasCollidedWith(planet))
                     {
                         powerUp.ApplyPlanet(level, planet);
                         powerUp.IsDestroyed = true;
@@ -219,7 +214,7 @@ namespace ZapoctakProg2
                 for (var j = i + 1; j < powerUps.Count; j++)
                 {
                     if(powerUps[j].IsDestroyed) continue;
-                    if (powerUp.HasCrashedWith(powerUps[j]))
+                    if (powerUp.HasCollidedWith(powerUps[j]))
                     {
                         powerUp.ApplyPowerup(level, powerUps[j]);
                         powerUps[j].ApplyPowerup(level, powerUp);

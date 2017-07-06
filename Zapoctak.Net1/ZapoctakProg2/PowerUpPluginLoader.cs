@@ -14,10 +14,10 @@ namespace ZapoctakProg2
 {
     class PowerUpPluginLoader
     {
-        private const string PluginPath = @"..\..\plugin\";
+        private const string DefaultPluginPath = @"..\..\plugin\";
         public static PowerUpPluginLoader Instance { get; } = new PowerUpPluginLoader();
 
-        private Dictionary<string, IPowerUpParser> parsers = new Dictionary<string, IPowerUpParser>();
+        private readonly Dictionary<string, IPowerUpParser> parsers = new Dictionary<string, IPowerUpParser>();
         public IReadOnlyDictionary<string, IPowerUpParser> Parsers => parsers;
 
         public void Register(string key, IPowerUpParser value)
@@ -36,7 +36,7 @@ namespace ZapoctakProg2
 
 
 
-        public void LoadPlugins(string path = PluginPath)
+        public void LoadPlugins(string path = DefaultPluginPath)
         {
             if(!Directory.Exists(path)) return;
             var files = from file in Directory.EnumerateFiles(path)

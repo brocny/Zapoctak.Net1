@@ -82,15 +82,15 @@ namespace ZapoctakProg2
         }
 
   
-        public override void Draw(Graphics gr, double scaleFactor)
+        public override void Draw(Graphics graphics, double scaleFactor)
         {
             //font used to display the mass of the sun
             var massFont = new Font("Arial", 11.0f * (float)scaleFactor);
 
-            gr.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            graphics.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            gr.DrawString(mass.ToString(CultureInfo.InvariantCulture), massFont, Brushes.Black, (float)((xPos - 3.7 * scaleFactor * mass.ToString(CultureInfo.InvariantCulture).Length) * scaleFactor), (float)((yPos - 7) * scaleFactor));
+            graphics.DrawString(mass.ToString(CultureInfo.InvariantCulture), massFont, Brushes.Black, (float)((xPos - 3.7 * scaleFactor * mass.ToString(CultureInfo.InvariantCulture).Length) * scaleFactor), (float)((yPos - 7) * scaleFactor));
         }
 
     }

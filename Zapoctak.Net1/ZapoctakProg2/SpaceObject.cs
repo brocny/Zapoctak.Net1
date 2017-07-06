@@ -5,7 +5,11 @@ namespace ZapoctakProg2
 {
     public struct Coordinates
     {
-        private double xPos, yPos, xVel, yVel, radius;
+        private readonly double xPos;
+        private readonly double yPos;
+        private readonly double xVel;
+        private readonly double yVel;
+        private readonly double radius;
         public double XPos => xPos;
         public double YPos => yPos;
         public double XVel => xVel;
@@ -24,7 +28,13 @@ namespace ZapoctakProg2
 
     public abstract class SpaceObject
     {
-        public const int SlowdownFactor = 20;
+        /// <summary>
+        /// Reduces the amount objects move per tick
+        /// </summary>
+        public int SlowdownFactor { get; set; } = 20;
+        /// <summary>
+        /// Reduces acceleration due to gravity
+        /// </summary>
         public const int GravityReductionFactor = 100;
 
         protected SpaceObject(double xPos, double yPos, double xVel, double yVel, double radius)
@@ -38,31 +48,30 @@ namespace ZapoctakProg2
 
         protected SpaceObject(Coordinates coords)
             : this(coords.XPos, coords.YPos, coords.XVel, coords.YVel, coords.Radius)
-        {
-            
-        }
+        { }
 
-        public bool IsDestroyed { get; set; }
+        public virtual bool IsDestroyed { get; set; }
 
-
-        //position on the x and y axes
+        
         protected double xPos, yPos;
-        public double XPos { get { return xPos; } }
-        public double YPos { get { return yPos; } }
+        /// <summary>
+        /// Position on the X axis (positive towards left)
+        /// </summary>
+        public double XPos => xPos;
+        /// <summary>
+        /// Position on the Y axis (positive towards bottom)
+        /// </summary>
+        public double YPos => yPos;
 
         //velocity along the x and y axes
         protected double xVel, yVel;
-        public double XVel { get { return xVel; } }
-        public double YVel { get { return yVel; } }
+        public double XVel => xVel;
+        public double YVel => yVel;
 
         //object radius - for drawing & detecting collisions
         protected double radius;
         public double Radius => radius;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="toObject"></param>
+        
         /// <returns>Distance to <code>toObject</code></returns>
         public double DistanceTo(SpaceObject toObject)
         {
@@ -70,27 +79,52 @@ namespace ZapoctakProg2
                             (yPos - toObject.YPos) * (yPos - toObject.YPos));
 
         }
-        public abstract void Draw(Graphics gr, double scaleFactor);
+
+        public abstract void Draw(Graphics graphics, double scaleFactor);
 
     }
 
     public abstract class MovingSpaceObject : SpaceObject
     {
         protected MovingSpaceObject(double xPos, double yPos, double xVel, double yVel, double radius) : base (xPos, yPos, xVel, yVel, radius)
-        {
-            
-        }
+        { }
 
         protected MovingSpaceObject(Coordinates coords) : base(coords) { }
+        
+        public bool IsImmortal { get; set; }
 
-        public abstract override void Draw(Graphics gr, double scaleFactor);
+        private bool isDestroyed;
+        public override bool IsDestroyed
+        {
+            get { return isDestroyed; }
+            set
+            {
+                if (IsImmortal && value)
+                    return;
+                isDestroyed = value;
+            }
+        }
 
+        /// <summary>
+        /// Draw the <code>SpaceObject</code>
+        /// </summary>
+        /// <param name="graphics"></param>
+        /// <param name="scaleFactor"></param>
+        public abstract override void Draw(Graphics graphics, double scaleFactor);
+
+
+        /// <summary>
+        /// Update <code>SpaceObject</code>'s position after one tick
+        /// </summary>
         public void UpdatePosition()
         {
             xPos += xVel / SlowdownFactor;
             yPos += yVel / SlowdownFactor;
         }
 
+        /// <summary>
+        /// Update <code>SpaceObject</code>'s velocity based on how much it would have accelerated towards <code>sun</code> in a single tick
+        /// </summary>
         public void UpdateVelocity(Sun sun, double gravityConst)
         {
             var sunDistance = DistanceTo(sun);
@@ -99,17 +133,27 @@ namespace ZapoctakProg2
             xVel -= gravityConst * sun.Mass * (xPos - sun.XPos) / sunDistance3 / SlowdownFactor / 100;
             yVel -= gravityConst * sun.Mass * (yPos - sun.YPos) / sunDistance3 / SlowdownFactor / 100;
         }
+        
 
-        public bool HasCrashedWith(SpaceObject withObject)
+        /// <returns>True if collision has occured between <code>MovingSpaceObject</code> and <code>withObject</code></returns>
+        public bool HasCollidedWith(SpaceObject withObject)
         {
             return DistanceTo(withObject) < radius + withObject.Radius;
         }
-
         
-
-        protected void DrawVelocityArrowFromCentre(Graphics gr, double scaleFactor, float arrowSize, Pen pen)
+        protected void DrawVelocityArrowFromCentre(Graphics gr, double scaleFactor, Pen pen, float arrowSize = 2)
         {
             var startPoint = new PointF((float)(xPos * scaleFactor), (float)(yPos * scaleFactor));
+            var endPoint = new PointF((float)((xPos + arrowSize * xVel) * scaleFactor), (float)((yPos + arrowSize * yVel) * scaleFactor));
+            gr.DrawLine(pen, startPoint, endPoint);
+        }
+
+        protected void DrawVelocityArrowFromCircumference(Graphics gr, double scaleFactor, Pen pen, float arrowSize = 2)
+        {
+            var factor = Math.Sqrt(xVel * xVel + yVel * yVel);
+            var xDelta = radius * xVel / factor;
+            var yDelta = radius * yVel / factor;
+            var startPoint = new PointF((float)((xPos + xDelta)*scaleFactor), (float)((yPos + yDelta)*scaleFactor));
             var endPoint = new PointF((float)((xPos + arrowSize * xVel) * scaleFactor), (float)((yPos + arrowSize * yVel) * scaleFactor));
             gr.DrawLine(pen, startPoint, endPoint);
         }

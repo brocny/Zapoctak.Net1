@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace ZapoctakProg2
@@ -59,6 +60,8 @@ namespace ZapoctakProg2
             CurrentLevel = level;
             level.Activate();
             textLabel.Text = CurrentLevel.Description;
+            var oldTimerInterval = timer1.Interval;
+            timer1 = new Timer {Enabled = false, Interval = oldTimerInterval};
             
             UpdateButtons();
         }
@@ -73,9 +76,18 @@ namespace ZapoctakProg2
             // check every 10th tick, if the level is finished, if it is check won or lost
             if (timeCheckCounter == 9 && CurrentLevel.CheckTimeLimit())
             {
+                foreach (PowerUp powerUp in CurrentLevel.PowerUps.Where(p => !p.IsDestroyed))
+                {
+                    powerUp.ApplyTimeOver(CurrentLevel);
+                }
+
+                if (!CurrentLevel.CheckTimeLimit())
+                {
+                    return;
+                }
                 CurrentLevel.End();
                 UpdateButtons();
-                textLabel.Text = CurrentLevel.CheckVictory() ? Level.WinMessage : CurrentLevel.EndLevelMessage;
+                textLabel.Text = CurrentLevel.CheckVictory() ? Level.WinMessage : CurrentLevel.LoseMessage;
             }
             timeCheckCounter = (timeCheckCounter + 1) % 10;
 

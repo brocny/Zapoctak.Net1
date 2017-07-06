@@ -15,6 +15,7 @@ namespace ZapoctakProg2
 
         private readonly Brush brush;
         private readonly Color color;
+        private static readonly Pen ImmortalHaloPen = new Pen(Color.AntiqueWhite, 2f);
 
         private static readonly Pen VelocityPen = new Pen(Color.White, 3f);
         
@@ -58,11 +59,19 @@ namespace ZapoctakProg2
         /// Draws the planet using the provided <code>Graphics</code> and <code>scaleFactor</code>
         /// </summary>
         private const int ArrowSize = 2;
-        public override void Draw(Graphics gr, double scaleFactor)
+        public override void Draw(Graphics graphics, double scaleFactor)
         {
-            gr.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            if (IsImmortal)
+            {
+                graphics.DrawEllipse(ImmortalHaloPen, (float)((xPos - radius * 1.1) * scaleFactor), (float)((yPos - radius * 1.1) * scaleFactor),
+                (float)(2.2 * radius * scaleFactor), (float)(2.2 * radius * scaleFactor));
+            }
+            graphics.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
-            DrawVelocityArrowFromCentre(gr, scaleFactor, ArrowSize, VelocityPen);
+            DrawVelocityArrowFromCentre(graphics, scaleFactor, VelocityPen, ArrowSize);
+
+
+               
         }
 
     }

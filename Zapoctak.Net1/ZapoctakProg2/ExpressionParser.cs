@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ZapoctakProg2
 {
-    static class ExpressionParser
+    public static class ExpressionParser
     {
         static readonly string[] ParamSeparator = new[] {"=>"};
         private static readonly char[] TrimmedChars = new[] {'(', ')', ' '};
-
+        /// <summary>
+        /// Parser a single-parameter (parameter type is <code>Level</code>) lambda function in the form of a string
+        /// </summary>
+        /// <param name="expr">Expression to be parsed</param>
+        /// <returns>Function corresponding to <code>expr</code></returns>
         public static Func<Level, bool> Parse(string expr)
         {
             var exprParts = expr.Split(ParamSeparator, StringSplitOptions.None);
@@ -23,4 +28,5 @@ namespace ZapoctakProg2
             return (Func<Level, bool>) expression.Compile();
         }
     }
+
 }

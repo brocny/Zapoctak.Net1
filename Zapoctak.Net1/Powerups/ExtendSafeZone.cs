@@ -23,8 +23,10 @@ namespace Powerups
 
     public class ExtendSafeZone : PowerUp
     {
-        private static readonly Brush Brush = new SolidBrush(Color.Magenta);
-        private static readonly Pen VelocityPen = new Pen(Color.AntiqueWhite, 3);
+        private static readonly Pen CircumferencePen = new Pen(Color.DarkMagenta, 3f);
+        private static readonly Pen VelocityPen = new Pen(Color.DarkMagenta, 3);
+        private static readonly Brush TextBrush = new SolidBrush(Color.DarkMagenta);
+        private static readonly Font Font = new Font(FontFamily.GenericSansSerif, 9.5f);
 
         private readonly float extensionFactor;
 
@@ -47,7 +49,6 @@ namespace Powerups
         public override void ApplyPlanet(Level level, Planet planet)
         {
             level.Physics.MaxSafeDistance *= extensionFactor;
-            level.Graphics.ScaleFactor /= extensionFactor;
         }
 
         public override void ApplyPowerup(Level level, PowerUp powerUp)
@@ -55,7 +56,6 @@ namespace Powerups
             if (powerUp.GetType() == typeof(ExtendSafeZone))
             {
                 level.Physics.MaxSafeDistance *= extensionFactor * 1.1;
-                level.Graphics.ScaleFactor *= extensionFactor
             }
             else
             {
@@ -69,7 +69,7 @@ namespace Powerups
         }
 
         public override void ApplyTimeOver(Level level)
-        {
+        { // Do nothing
         }
 
         public override void ApplyTooFar(Level level)
@@ -77,12 +77,15 @@ namespace Powerups
             level.Physics.MaxSafeDistance *= extensionFactor;
         }
 
-        public override void Draw(Graphics gr, double scaleFactor)
+        public override void Draw(Graphics graphics, double scaleFactor)
         {
-            gr.FillEllipse(Brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            graphics.DrawEllipse(CircumferencePen, 
+                (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            DrawVelocityArrowFromCentre(gr, scaleFactor, 2, VelocityPen);
+            graphics.DrawString(extensionFactor.ToString("N1"), Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
+
+            DrawVelocityArrowFromCircumference(graphics, scaleFactor, VelocityPen);
         }
     }
 }

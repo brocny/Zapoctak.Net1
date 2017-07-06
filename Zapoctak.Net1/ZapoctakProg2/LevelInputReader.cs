@@ -15,11 +15,15 @@ namespace ZapoctakProg2
             this.streamReader = streamReader;
             this.level = level;
         }
-
+        /// <summary>
+        /// Reads suns
+        /// Format: single line containing the number of suns
+        /// Each line contains information about 1 sun in the following format: xPos yPos xVel yVel radius temperature
+        /// </summary>
         public List<Sun> ReadSuns()
         {
             var numSuns = int.Parse(ReadLine());
-            var suns = new List<Sun>();
+            var suns = new List<Sun>(numSuns);
 
             for (var i = 0; i < numSuns; i++)
             {
@@ -33,10 +37,16 @@ namespace ZapoctakProg2
             return suns;
         }
 
+        /// <summary>
+        /// Reads planets
+        /// Format: single line containing the number of planets
+        /// Each line contains information about 1 planet in the following format: xPos yPos xVel yVel radius type
+        /// </summary>
+        /// <returns></returns>
         public List<Planet> ReadPlanets()
         {
             var numPlanets = int.Parse(ReadLine());
-            var planets = new List<Planet>();
+            var planets = new List<Planet>(numPlanets);
 
             for (var i = 0; i < numPlanets; i++)
             {
@@ -120,22 +130,22 @@ namespace ZapoctakProg2
             return coords;
         }
 
-        public (List<Func<Level, bool>>, string) ReadWinConditions()
+        public (List<Func<Level, bool>>, string[]) ReadWinConditions()
         {
             var numConditions = int.Parse(ReadLine());
             var winConditions = new List<Func<Level, bool>>(numConditions);
 
-            var descriptionBuilder = new StringBuilder("Level requirements: \n");
+            var descriptions = new string[numConditions];
 
             for (int i = 0; i < numConditions; i++)
             {
                 var line = ReadLine();
                 var parsedExpression = ExpressionParser.Parse(line);
                 winConditions.Add(parsedExpression);
-                descriptionBuilder.AppendLine(ReadLine());
+                descriptions[i] = ReadLine();
             }
 
-            return (winConditions, descriptionBuilder.ToString());
+            return (winConditions, descriptions);
         }
 
         public string ReadDescription()

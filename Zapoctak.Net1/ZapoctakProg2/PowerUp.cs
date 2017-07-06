@@ -18,9 +18,7 @@ namespace ZapoctakProg2
     public abstract class PowerUp : MovingSpaceObject
     {
         protected PowerUp(double xPos, double yPos, double xVel, double yVel, double radius) : base (xPos, yPos, xVel, yVel, radius)
-        {
-
-        }
+        { }
 
         protected PowerUp(Coordinates coords): base(coords) { }
 
@@ -28,7 +26,6 @@ namespace ZapoctakProg2
         /// Will be called after a crash with <code>Planet</code>
         /// </summary>
         public abstract void ApplyPlanet(Level level, Planet planet);
-        
         /// <summary>
         /// Will be called after a crash with <code>Sun</code>
         /// </summary>
@@ -67,14 +64,14 @@ namespace ZapoctakProg2
             this.reduceAmount = reduceAmount;
         }
 
-        public override void Draw(Graphics gr, double scaleFactor)
+        public override void Draw(Graphics graphics, double scaleFactor)
         {
-            gr.DrawEllipse(CircumferencePen, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            graphics.DrawEllipse(CircumferencePen, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            gr.DrawString($"-{reduceAmount}", Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
+            graphics.DrawString($"-{reduceAmount}", Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
 
-            DrawVelocityArrowFromCentre(gr, scaleFactor, 2, VelocityPen);
+            DrawVelocityArrowFromCircumference(graphics, scaleFactor, VelocityPen);
         }
 
         public override void ApplyPlanet(Level level, Planet planet)
@@ -106,11 +103,11 @@ namespace ZapoctakProg2
         }
 
         public override void ApplyTooFar(Level level)
-        {
+        {// Do nothing
         }
         
         public override void ApplyTimeOver(Level level)
-        {   
+        {// Do nothing   
         }
     }
 

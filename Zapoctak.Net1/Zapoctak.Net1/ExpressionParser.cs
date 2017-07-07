@@ -38,6 +38,7 @@ namespace ZapoctakProg2
         private static readonly string PlanetCountByTypeName = nameof(Level.PlanetCountByType).Split('.').Last();
         private static readonly string PlanetsName = nameof(Level.Planets).Split('.').Last();
 
+
         private static readonly Dictionary<ExpressionType, string> OperatorDict = new Dictionary<ExpressionType, string>()
         {
             {ExpressionType.Add, " + "},
@@ -61,18 +62,15 @@ namespace ZapoctakProg2
         private static string GenerateDescriptionInternal(Expression expr, string paramName)
         {
             var exprStr = expr.ToString();
-            /**if (exprStr == $"{paramName}.{PlanetCountByTypeName}[0]")
+            if (exprStr == $"{paramName}.{PlanetCountByTypeName}[0]")
                 return "Good planets";
             if (exprStr == $"{paramName}.{PlanetCountByTypeName}[1]")
                 return "Neutral planets";
             if (exprStr == $"{paramName}.{PlanetCountByTypeName}[2]")
                 return "Bad planets";
             if (exprStr == $"{paramName}.{PlanetsName}.Count")
-                return "Total planets";*/
-            if (expr.NodeType == ExpressionType.ArrayIndex)
-            {
-                var indExpr = (IndexExpression) expr;
-            }
+                return "Total planets";
+           
 
             BinaryExpression binExpr;
             if ((binExpr = expr as BinaryExpression) != null)

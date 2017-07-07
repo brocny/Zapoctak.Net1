@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace ZapoctakProg2
@@ -115,7 +116,9 @@ namespace ZapoctakProg2
 
             return powerUps;
         }
-
+        /// <summary>
+        /// More convenient way to read <code>Coordinates</code>; fomrmat: <code>xPos yPos xVel yVel radius</code>
+        /// </summary>
         public Coordinates ReadCoordinates()
         {
             var coordStrings = ReadLine().Split(' ');
@@ -141,8 +144,16 @@ namespace ZapoctakProg2
             {
                 var line = ReadLine();
                 var parsedExpression = ExpressionParser.Parse(line);
-                winConditions.Add(parsedExpression);
-                descriptions[i] = ReadLine();
+                winConditions.Add((Func<Level, bool>)parsedExpression.Compile());
+                string desc;
+                if ((desc = ReadLine().ToLowerInvariant()) == "auto")
+                {
+                    descriptions[i] = ExpressionParser.GenerateDescription(parsedExpression);
+                }
+                else
+                {
+                    descriptions[i] = desc;
+                }
             }
 
             return (winConditions, descriptions);

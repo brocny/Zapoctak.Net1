@@ -1,49 +1,46 @@
 #!Make sure to use "," for decimal point!
 #
 #number of planets
-5
+7
 #planet stats 
 #x   y  xvel yvel radius type
-420 350 0 22 15 0
-720 350 0 18 18 0
-170 350 0 -16 14 0
-920 350 0 11 11 0
-540 290 0 13 13 0
+520 350 4 25 15 0
+750 350 0 16 18 0
+270 350 7 -11 14 0
+400 600 -14 -3 11 0
+640 290 -8,5 -9 11 0
+190 680 7 7 7 2
+550 140 -10 -7 16 2
 #number of suns
-2
+1
 #sun stats
 #x y xvel yvel radius temperature mass
-340 430 0 0 45 2500 5500
-660 390 0 0 38 7500 5200
+440 425 0 0 45 2500 5500
 #number of powerups
-2
+0
 #powerUp stats
 #type
 #x y xvel yvel radius
 #additional info
-ReduceTime
-500 500 4 -19 14
-5
-ExtendSafeZone
-440 400 -2 16 16
-1,2
 #gravity constant
-700
+900
 #maxdistance
-360
+415
 #minimum gravity
 300
 #maximum gravity
-1200
+1400
 #graphics scale factor
 0,9
 #time limit (seconds)
-20
-#number of lose conditions
-1
+45
+#number of win requirements
+2
 #lose conditions
 level => level.PlanetCountByType[Good] >= 2
-Minimum Good planets: 2
+auto
+level => level.PlanetCountByType[Bad] <= 1
+auto
 #nextlevel filename
-level2.txt
+level3.txt
 #level description

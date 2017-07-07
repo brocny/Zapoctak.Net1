@@ -47,7 +47,7 @@
     <Compile Include="TemporaryDestroy.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ZapoctakProg2\Zapoctak.Net1.csproj">
+    <ProjectReference Include="..\Zapoctak.Net1\Zapoctak.Net1.csproj">
       <Project>{5d296298-4062-4ee4-9e8f-bbb2e7cc4169}</Project>
       <Name>Zapoctak.Net1</Name>
     </ProjectReference>

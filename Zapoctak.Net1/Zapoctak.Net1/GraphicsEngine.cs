@@ -8,9 +8,9 @@ namespace ZapoctakProg2
     public class GraphicsEngine
     {
         // Brush which will be used to draw the survival zone
-        public static Brush SafeZoneBrush { get; } = new SolidBrush(Color.FromArgb(40, 40, 45));
+        public static Brush SafeZoneBrush { get; } = new SolidBrush(Color.FromArgb(40, 40, 48));
         //Brush used for the background color - its color the is the dead zone and the Good zone is drawn on top of it
-        public static Brush DeathZoneBrush { get; } = new SolidBrush(Color.FromArgb(60, 10, 10));
+        public static Brush DeathZoneBrush { get; } = new SolidBrush(Color.FromArgb(48, 0, 0));
 
         private readonly Level level;
         private readonly List<Sun> suns;

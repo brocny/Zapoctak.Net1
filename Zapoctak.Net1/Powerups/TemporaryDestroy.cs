@@ -66,15 +66,15 @@ namespace Powerups
         class TimeKeeper
         {
             private readonly Level level;
-            private readonly long startMs;
-            private readonly int timeDurationMs;
+            private readonly long startTimeMs;
             private readonly SpaceObject resurrect;
+            private readonly long endTimeMs;
 
-            public TimeKeeper(Level level, SpaceObject resurrect, long startMs, int timeDurationMs)
+            public TimeKeeper(Level level, SpaceObject resurrect, long startTimeMs, int timeDurationMs)
             {
                 this.level = level;
-                this.startMs = startMs;
-                this.timeDurationMs = timeDurationMs;
+                this.startTimeMs = startTimeMs;
+                endTimeMs = startTimeMs + timeDurationMs;
                 this.resurrect = resurrect;
             }
 
@@ -86,7 +86,7 @@ namespace Powerups
                     return;
                 }
 
-                if (level.Stopwatch.ElapsedMilliseconds > startMs + timeDurationMs)
+                if (level.Stopwatch.ElapsedMilliseconds > endTimeMs)
                 {
                     resurrect.IsDestroyed = false;
                     level.Form.Timer.Tick -= CheckTime;

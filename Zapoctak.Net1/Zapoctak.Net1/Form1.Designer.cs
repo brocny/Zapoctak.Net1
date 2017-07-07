@@ -1,4 +1,6 @@
-﻿namespace ZapoctakProg2
+﻿using System.Drawing;
+
+namespace ZapoctakProg2
 {
     partial class Form1
     {
@@ -125,10 +127,12 @@
             // textLabel
             // 
             this.textLabel.AutoSize = true;
-            this.textLabel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.textLabel.BackColor =
+                //System.Drawing.Color.FromArgb(((int)(((byte)(40)))), ((int)(((byte)(40)))), ((int)(((byte)(48)))));
+                Color.Transparent;
             this.textLabel.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textLabel.ForeColor = System.Drawing.Color.White;
-            this.textLabel.Location = new System.Drawing.Point(545, 48);
+            this.textLabel.Location = new System.Drawing.Point(12, 48);
             this.textLabel.Name = "textLabel";
             this.textLabel.Size = new System.Drawing.Size(0, 24);
             this.textLabel.TabIndex = 13;
@@ -139,7 +143,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.ClientSize = new System.Drawing.Size(1453, 1045);
+            this.ClientSize = new System.Drawing.Size(1453, 1037);
             this.Controls.Add(this.textLabel);
             this.Controls.Add(this.timeLabel);
             this.Controls.Add(this.restartButton);

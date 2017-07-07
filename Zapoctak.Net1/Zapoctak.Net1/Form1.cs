@@ -17,6 +17,10 @@ namespace ZapoctakProg2
         public Form1()
         {
             InitializeComponent();
+            var pos = PointToScreen(textLabel.Location);
+            pos = pictureBox1.PointToClient(pos);
+            textLabel.Parent = pictureBox1;
+            textLabel.Location = pos;
         }
 
 
@@ -25,7 +29,7 @@ namespace ZapoctakProg2
         /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
-            var form = new FormInteraction(timer1, gravityScrollBar, pictureBox1, timeLabel);
+            var form = new FormInteraction(timer1, gravityScrollBar, pictureBox1, timeLabel, textLabel);
             var powerUpLoader = PowerUpPluginLoader.Instance;
             powerUpLoader.LoadPlugins();
             CurrentLevel = new Level(form, null, Level.Firstlevelpath);

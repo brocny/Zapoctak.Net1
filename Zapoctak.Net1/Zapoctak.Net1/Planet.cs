@@ -17,14 +17,9 @@ namespace ZapoctakProg2
         private readonly Color color;
         private static readonly Pen ImmortalHaloPen = new Pen(Color.AntiqueWhite, 2f);
 
-        private static readonly Pen VelocityPen = new Pen(Color.White, 3f);
+        private static readonly Pen VelocityPen = new Pen(Color.White, 3f) {EndCap = LineCap.ArrowAnchor};
         
         public const double MinimumRadius = 1;
-
-        static Planet()
-        {
-            VelocityPen.EndCap = LineCap.ArrowAnchor;
-        }
         
         public Planet(double xPos, double yPos, double xVel, double yVel, double radius, PlanetType type) : base(xPos, yPos, xVel, yVel, radius)
         {
@@ -47,7 +42,10 @@ namespace ZapoctakProg2
         }
         
 
-        //shrinks the planets radius if it is too close to the given Sun
+        /// <summary>
+        /// Reduce planet radius if it is too close <code>sun</code> based on <code>sun</code>'s temperature
+        /// </summary>
+        /// <param name="sun"></param>
         public void ApplyBurns(Sun sun)
         {
             var sunSurfaceDistance = DistanceTo(sun) - sun.Radius;
@@ -69,9 +67,6 @@ namespace ZapoctakProg2
             graphics.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
             DrawVelocityArrowFromCentre(graphics, scaleFactor, VelocityPen, ArrowSize);
-
-
-               
         }
 
     }

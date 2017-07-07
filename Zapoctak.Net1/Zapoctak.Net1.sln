@@ -3,11 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zapoctak.Net1", "ZapoctakProg2\Zapoctak.Net1.csproj", "{5D296298-4062-4EE4-9E8F-BBB2E7CC4169}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zapoctak.Net1", "Zapoctak.Net1\Zapoctak.Net1.csproj", "{5D296298-4062-4EE4-9E8F-BBB2E7CC4169}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Powerups", "Powerups\Powerups.csproj", "{83402F8E-5457-4212-AD3B-2153DC496A2E}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

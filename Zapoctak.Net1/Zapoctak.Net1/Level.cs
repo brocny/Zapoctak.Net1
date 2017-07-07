@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ZapoctakProg2
@@ -89,7 +90,7 @@ namespace ZapoctakProg2
         /// <summary>
         /// Shown at the top - used to display level objectives and/or any additional info
         /// </summary>
-        public string Description { get; internal set; }
+        public string Description { get; internal set; } = "Level requirements: \n";
 
         private string[] goalDescriptions;
 
@@ -231,6 +232,16 @@ namespace ZapoctakProg2
                 planetCountByType[(int)planet.Type]++;
         }
 
+        private string ConcatDescription()
+        {
+            var descBuilder = new StringBuilder();
+            foreach (var goalDescription in goalDescriptions)
+            {
+                descBuilder.AppendLine(goalDescription);
+            }
+            return descBuilder.ToString();
+        }
+
 
         /// <summary>
         /// Load level information from <code>currentPath</code>
@@ -251,7 +262,7 @@ namespace ZapoctakProg2
                 winConditions = conditions.Item1;
                 goalDescriptions = conditions.Item2;
                 nextLevelPath = inputReader.ReadNextLevelPath();
-                Description = Description + inputReader.ReadDescription();
+                Description += ConcatDescription() + inputReader.ReadDescription();
             }
             catch (IOException)
             {
@@ -267,13 +278,15 @@ namespace ZapoctakProg2
         public ScrollBar GravityScrollBar { get; private set; }
         public PictureBox PictureBox { get; private set; }
         public Label TimeLabel { get; private set; }
+        public Label TextLabel { get; private set; }
 
-        public FormInteraction(Timer timer, ScrollBar scrollBar, PictureBox pictureBox, Label timeLabel)
+        public FormInteraction(Timer timer, ScrollBar scrollBar, PictureBox pictureBox, Label timeLabel, Label textLabel)
         {
             Timer = timer;
             GravityScrollBar = scrollBar;
             PictureBox = pictureBox;
             TimeLabel = timeLabel;
+            TextLabel = textLabel;
         }
     }
 

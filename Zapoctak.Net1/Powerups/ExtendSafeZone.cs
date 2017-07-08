@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ZapoctakProg2;
 
 namespace Powerups
@@ -21,6 +16,9 @@ namespace Powerups
         public string PowerUpId { get; } = "ExtendSafeZone";
     }
 
+    /// <summary>
+    /// Increase the maximum safe distance upon contact with any other object
+    /// </summary>
     public class ExtendSafeZone : PowerUp
     {
         private static readonly Pen CircumferencePen = new Pen(Color.DarkMagenta, 3f);
@@ -53,6 +51,7 @@ namespace Powerups
 
         public override void ApplyPowerup(Level level, PowerUp powerUp)
         {
+            // effect is amplified upon collison with the same type of powerup
             if (powerUp.GetType() == typeof(ExtendSafeZone))
             {
                 level.Physics.MaxSafeDistance *= extensionFactor * 1.1;
@@ -83,7 +82,7 @@ namespace Powerups
                 (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            graphics.DrawString(extensionFactor.ToString("N1"), Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
+            graphics.DrawString($"x{extensionFactor:N1}", Font, TextBrush, (float)((xPos - radius / 2) * scaleFactor), (float)((yPos - radius / 2) * scaleFactor));
 
             DrawVelocityArrowFromCircumference(graphics, scaleFactor, VelocityPen);
         }

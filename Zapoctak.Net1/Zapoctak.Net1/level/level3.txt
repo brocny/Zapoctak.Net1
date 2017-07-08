@@ -21,10 +21,10 @@
 #type
 #x y xvel yvel radius
 #additional info
-#gravity constant
-400
 #maxdistance
 285
+#gravity constant
+400
 #minimum gravity
 100
 #maximum gravity

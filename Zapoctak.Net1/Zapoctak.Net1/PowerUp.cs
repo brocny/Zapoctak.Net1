@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace ZapoctakProg2
 {
@@ -49,9 +44,9 @@ namespace ZapoctakProg2
     public class ReduceTimePowerUp : PowerUp
     {
         private readonly int reduceAmount;
-        private static readonly Font Font = new Font(FontFamily.GenericSansSerif, 9f);
-        private static readonly Pen CircumferencePen = new Pen(Color.GreenYellow, 2f);
-        private static readonly Pen VelocityPen = new Pen(Color.GreenYellow, 2f) {EndCap = LineCap.ArrowAnchor};
+        private static readonly Font Font = new Font(FontFamily.GenericSansSerif, 9.5f);
+        private static readonly Pen CircumferencePen = new Pen(Color.GreenYellow, 3f);
+        private static readonly Pen VelocityPen = new Pen(Color.GreenYellow, 3f) {EndCap = LineCap.ArrowAnchor};
         private static readonly Brush TextBrush = new SolidBrush(Color.GreenYellow);
 
         public ReduceTimePowerUp(double xPos, double yPos, double xVel, double yVel, double radius, int reduceAmount) : base (xPos, yPos, xVel, yVel, radius)

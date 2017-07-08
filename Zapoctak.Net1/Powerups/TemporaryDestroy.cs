@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using ZapoctakProg2;
 
 namespace Powerups
 {
-    class TemporaryDestroy : PowerUp
+    /// <summary>
+    /// Temporary destroy an object this collides with, bring it back after <code>destructionTime</code> miliseconds
+    /// </summary>
+    public class TemporaryDestroy : PowerUp
     {
         private readonly int destructionTime;
 
         private static readonly Pen CircumferencePen = new Pen(Color.Red, 3f);
         private static readonly Pen VelocityPen = new Pen(Color.Red, 3f) {EndCap = LineCap.ArrowAnchor};
 
-        public TemporaryDestroy(double xPos, double yPos, double xVel, double yVel, double radius, int destructionTime) : base(xPos, yPos, xVel, yVel, radius)
+        public TemporaryDestroy(double xPos, double yPos, double xVel, double yVel, double radius, int destructionTime) : 
+            base(xPos, yPos, xVel, yVel, radius)
         {
             this.destructionTime = destructionTime;
         }
@@ -28,11 +28,17 @@ namespace Powerups
 
         public override void Draw(Graphics graphics, double scaleFactor)
         {
-            graphics.DrawEllipse(CircumferencePen, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
+            graphics.DrawEllipse(CircumferencePen, 
+                (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
+            
+            var topLeft = new PointF((float)((xPos - radius * 1.1) * scaleFactor), (float)((yPos - radius * 1.1) * scaleFactor));
+            var bottomRight = new PointF((float)((xPos + radius * 1.1) * scaleFactor), (float)((yPos + radius * 1.1) * scaleFactor));
+            var topRight = new PointF((float)((xPos + radius * 1.1) * scaleFactor), (float)((yPos - radius * 1.1) * scaleFactor));
+            var bottomLeft = new PointF((float)((xPos - radius * 1.1) * scaleFactor), (float)((yPos + radius * 1.1) * scaleFactor));
 
-            graphics.DrawLine(CircumferencePen,(float)(xPos + radius * 1.1),(float)(yPos + radius * 1.1),(float)(xPos - radius * 1.1),(float)(yPos - radius * 1.1));
-            graphics.DrawLine(CircumferencePen, (float)(xPos + radius * 1.1), (float)(yPos - radius * 1.1), (float)(xPos - radius * 1.1), (float)(yPos + radius * 1.1));
+            graphics.DrawLine(CircumferencePen, topLeft, bottomRight);
+            graphics.DrawLine(CircumferencePen, topRight, bottomLeft);
 
             DrawVelocityArrowFromCircumference(graphics, scaleFactor, VelocityPen);
         }
@@ -63,22 +69,23 @@ namespace Powerups
         { // Do nothing
         }
 
-        class TimeKeeper
+        /// <summary>
+        /// Helper class to measure time when to bring collided object back to life
+        /// </summary>
+        private class TimeKeeper
         {
             private readonly Level level;
-            private readonly long startTimeMs;
             private readonly SpaceObject resurrect;
             private readonly long endTimeMs;
 
             public TimeKeeper(Level level, SpaceObject resurrect, long startTimeMs, int timeDurationMs)
             {
                 this.level = level;
-                this.startTimeMs = startTimeMs;
                 endTimeMs = startTimeMs + timeDurationMs;
                 this.resurrect = resurrect;
             }
 
-            public void CheckTime(object sender, EventArgs e)
+            private void CheckTime(object sender, EventArgs e)
             {
                 if (level.IsEnded)
                 {
@@ -95,7 +102,7 @@ namespace Powerups
         }
     }
 
-    class TemporaryDestroyParser : IPowerUpParser
+    public class TemporaryDestroyParser : IPowerUpParser
     {
         public PowerUp Parse(LevelInputReader reader)
         {

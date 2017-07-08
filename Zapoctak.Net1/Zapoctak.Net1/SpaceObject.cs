@@ -153,8 +153,13 @@ namespace ZapoctakProg2
             var factor = Math.Sqrt(xVel * xVel + yVel * yVel);
             var xDelta = radius * xVel / factor;
             var yDelta = radius * yVel / factor;
-            var startPoint = new PointF((float)((xPos + xDelta)*scaleFactor), (float)((yPos + yDelta)*scaleFactor));
-            var endPoint = new PointF((float)((xPos + arrowSize * xVel) * scaleFactor), (float)((yPos + arrowSize * yVel) * scaleFactor));
+            var startPoint = new PointF(
+                (float)((xPos + xDelta)*scaleFactor), 
+                (float)((yPos + yDelta)*scaleFactor));
+
+            var endPoint = new PointF(
+                (float)((xPos + xDelta + arrowSize * xVel) * scaleFactor), 
+                (float)((yPos + yDelta + arrowSize * yVel) * scaleFactor));
             gr.DrawLine(pen, startPoint, endPoint);
         }
     }

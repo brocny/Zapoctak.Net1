@@ -9,7 +9,7 @@ namespace ZapoctakProg2
     {
         // Brush which will be used to draw the survival zone
         public static Brush SafeZoneBrush { get; } = new SolidBrush(Color.FromArgb(40, 40, 48));
-        //Brush used for the background color - its color the is the dead zone and the Good zone is drawn on top of it
+        // Brush used for the background color - its color the is the dead zone and the Good zone is drawn on top of it
         public static Brush DeathZoneBrush { get; } = new SolidBrush(Color.FromArgb(48, 0, 0));
 
         private readonly Level level;
@@ -37,19 +37,20 @@ namespace ZapoctakProg2
             pictureBox.Image = Bmp;
         }
 
-        
-        
 
-        //performs one tick of the graphics - draws everything
+
+
+        /// <summary>
+        /// One tick of Graphics - redraw everything
+        /// </summary>
         public void Tick()
         {
             ClearScreen();
             DrawSafeZone();
-            DrawObjects();
+            DrawSpaceObjects();
         }
 
-        //draws all the spaceobjects
-        private void DrawObjects()
+        private void DrawSpaceObjects()
         {
             foreach (var sun in suns.Where(s => !s.IsDestroyed))
             {

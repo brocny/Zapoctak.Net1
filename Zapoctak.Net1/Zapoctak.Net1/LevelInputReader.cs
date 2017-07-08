@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace ZapoctakProg2
 {
-    public class LevelInputReader
+    internal class LevelInputReader
     {
         private readonly StreamReader streamReader;
         private readonly Level level;
@@ -80,9 +79,9 @@ namespace ZapoctakProg2
 
         public PhysicsEngine ReadPhysicsEngine()
         {
-            var gravityConst = int.Parse(ReadLine());
             var maxDistance = double.Parse(ReadLine());
 
+            var gravityConst = int.Parse(ReadLine());
             var minGravity = int.Parse(ReadLine());
             var maxGravity = int.Parse(ReadLine());
 
@@ -95,6 +94,15 @@ namespace ZapoctakProg2
             return int.Parse(ReadLine());
         }
 
+        /// <summary>
+        /// Reads Powerups
+        /// Format: single line containg number of powerups
+        /// Information about each powerup is in multiple lines: 
+        /// 1st line: name of powerup (from its corresponding <code>IPowerUpParser</code>
+        /// 2nd line: coordinates of powerup: xPos yPos xVel yVel radius
+        /// Further lines: any information, it's the work of corresponding <code>IPowerUpParser</code> to read and parse these
+        /// </summary>
+        /// <returns></returns>
         public List<PowerUp> ReadPowerUps()
         {
             var numPowerUps = int.Parse(ReadLine());
@@ -110,7 +118,7 @@ namespace ZapoctakProg2
                 }
                 else
                 {
-                    throw new FormatException($"Unknown PowerUp id {powerUpId}");
+                    throw new FormatException($"Unknown PowerUp id: \"{powerUpId}\"");
                 }
             }
 

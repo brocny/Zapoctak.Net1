@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -19,6 +20,8 @@ namespace ZapoctakProg2
             var exprParts = expr.Split(ParamSeparator, StringSplitOptions.None);
             var paramName = exprParts[0].Trim(TrimmedChars);
             var body = exprParts[1];
+
+            // To allow more convenient indexing instead of e.g. PlanetCountByType[(int)Planet.PlanetType.Good] ... 
             body = body.Replace("Good", "0");
             body = body.Replace("Neutral", "1");
             body = body.Replace("Bad", "2");
@@ -36,7 +39,11 @@ namespace ZapoctakProg2
         /// <returns>String description of <code>expr</code> if <code>expr</code>has the correct format, null otherwise</returns>
 
         private static readonly string PlanetCountByTypeName = nameof(Level.PlanetCountByType).Split('.').Last();
-        private static readonly string PlanetsName = nameof(Level.Planets).Split('.').Last();
+        private static readonly string PlanetCountName = nameof(Level.PlanetCount).Split('.').Last();
+
+        private static readonly MemberInfo PlanetCountByTypeInfo = typeof(Level).GetProperty(PlanetCountByTypeName);
+        private static readonly MemberInfo PlanetCountInfo = typeof(Level).GetProperty(PlanetCountName);
+
 
 
         private static readonly Dictionary<ExpressionType, string> OperatorDict = new Dictionary<ExpressionType, string>()
@@ -54,37 +61,55 @@ namespace ZapoctakProg2
             {ExpressionType.GreaterThanOrEqual, " required at least "}
         };
 
+        /// <summary>
+        /// Generate description from lambda expression
+        /// </summary>
+        /// <param name="lambdaExpression"><code>LambdaExpression for which to generate description</code></param>
+        /// <returns>Description of the win condition if known, <code>lambdaExpression.ToString() if uknown</code></returns>
         public static string GenerateDescription(LambdaExpression lambdaExpression)
         {
-            return GenerateDescriptionInternal(lambdaExpression.Body, lambdaExpression.Parameters.First().ToString());
+            return GenerateDescriptionInternal(lambdaExpression.Body);
         }
 
-        private static string GenerateDescriptionInternal(Expression expr, string paramName)
+        private static string GenerateDescriptionInternal(Expression expr)
         {
-            var exprStr = expr.ToString();
-            if (exprStr == $"{paramName}.{PlanetCountByTypeName}[0]")
-                return "Good planets";
-            if (exprStr == $"{paramName}.{PlanetCountByTypeName}[1]")
-                return "Neutral planets";
-            if (exprStr == $"{paramName}.{PlanetCountByTypeName}[2]")
-                return "Bad planets";
-            if (exprStr == $"{paramName}.{PlanetsName}.Count")
-                return "Total planets";
-           
+            if (expr.NodeType == ExpressionType.ArrayIndex)
+            {
+                var indExpr = (BinaryExpression) expr;
+                if (indExpr.Left.NodeType == ExpressionType.MemberAccess && indExpr.Right.NodeType == ExpressionType.Constant)
+                {
+                    var memberExpr = (MemberExpression) indExpr.Left;
+                    var constExpr = (ConstantExpression) indExpr.Right;
+                    if (memberExpr.Member == PlanetCountByTypeInfo)
+                    {
+                        switch ((int)constExpr.Value)
+                        {
+                            case 0:
+                                return "Good planets";
+                            case 1:
+                                return "Neutral planets";
+                            case 2:
+                                return "Bad planets";
+                        }
+                    }
+                }
+            }
+            if (expr.NodeType == ExpressionType.MemberAccess)
+            {
+                var memberExpr = (MemberExpression) expr;
+                if (memberExpr.Member == PlanetCountInfo)
+                    return "Total planets";
+            }
 
             BinaryExpression binExpr;
             if ((binExpr = expr as BinaryExpression) != null)
             {
                 if (OperatorDict.TryGetValue(binExpr.NodeType, out string op))
                 {
-                    return GenerateDescriptionInternal(binExpr.Left, paramName) + op 
-                        + GenerateDescriptionInternal(binExpr.Right, paramName);
+                    return GenerateDescriptionInternal(binExpr.Left) + op 
+                        + GenerateDescriptionInternal(binExpr.Right);
                 }
             }
-            return exprStr;
-        }
 
-
-        
     }
 }

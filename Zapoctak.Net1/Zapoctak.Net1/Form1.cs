@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -17,6 +15,7 @@ namespace ZapoctakProg2
         public Form1()
         {
             InitializeComponent();
+            // to make textLabel transparent to show what's happening in the level behind it
             var pos = PointToScreen(textLabel.Location);
             pos = pictureBox1.PointToClient(pos);
             textLabel.Parent = pictureBox1;
@@ -96,7 +95,9 @@ namespace ZapoctakProg2
             timeCheckCounter = (timeCheckCounter + 1) % 10;
 
         }
-
+        /// <summary>
+        /// Set proper button labels and enable/disable buttons based on program state
+        /// </summary>
         private void UpdateButtons()
         {
             nextButton.Enabled = !CurrentLevel.IsLastLevel;
@@ -107,6 +108,7 @@ namespace ZapoctakProg2
             
             startButton.Enabled = !CurrentLevel.IsEnded;
         }
+
         /// <summary>
         /// Switch to previous level, disabled if no previous level
         /// </summary>
@@ -116,6 +118,7 @@ namespace ZapoctakProg2
             Level previousLevel = CurrentLevel.PreviousLevel;
             SwitchLevelTo(previousLevel);
         }
+
         /// <summary>
         /// Switch to next level, disabled if no next level
         /// </summary>
@@ -147,8 +150,6 @@ namespace ZapoctakProg2
         /// <summary>
         /// Enables gravity to adjusted by scrolling the mousewheel
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void Form1_MouseWheel(object sender, MouseEventArgs e)
         {
             int gravityChange = gravityScrollBar.SmallChange * e.Delta / 50;

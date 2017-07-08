@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+
 
 namespace ZapoctakProg2
 {
-    class PowerUpPluginLoader
+    public class PowerUpPluginLoader
     {
         private const string DefaultPluginPath = @"..\..\plugin\";
+        /// <summary>
+        /// Singleton design pattern
+        /// </summary>
         public static PowerUpPluginLoader Instance { get; } = new PowerUpPluginLoader();
 
         private readonly Dictionary<string, IPowerUpParser> parsers = new Dictionary<string, IPowerUpParser>();
@@ -30,35 +29,45 @@ namespace ZapoctakProg2
 
         public PowerUpPluginLoader()
         {
+            // Register hardcoded powerUps
             var reduceTimeParser = new ReduceTimeParser();
             Register(reduceTimeParser.PowerUpId, reduceTimeParser);
         }
 
 
-
+        /// <summary>
+        /// Load plugins from all files in the directory with names matching regex <code>.*[p|P]ower[-|_]?[u|U]p.*\.dll$</code>
+        /// </summary>
+        /// <param name="path">Plugin directory</param>
         public void LoadPlugins(string path = DefaultPluginPath)
         {
             if(!Directory.Exists(path)) return;
             var files = from file in Directory.EnumerateFiles(path)
-                where Regex.IsMatch(file, @".*Powerup.*\.dll$")
+                where Regex.IsMatch(file, @".*[p|P]ower[-|_]?[u|U]p.*\.dll$")
                 select Path.GetFullPath(file);
 
             foreach (var file in files)
             {
                 var assembly = Assembly.LoadFile(file);
-                var parser =
-                    assembly.DefinedTypes.FirstOrDefault(t => t.ImplementedInterfaces.Contains(typeof(IPowerUpParser)));
-                if(parser == null)
-                    throw new MissingMemberException($"{file} contains no type implementing {nameof(IPowerUpParser)}");
-                
-                if (parser.GetConstructor(new Type[0]) == null)
-                    throw new MissingMemberException($"{parser} in {file} has no parameterless constructor!");
+                var definedParsers = from parser in assembly.DefinedTypes
+                    where parser.ImplementedInterfaces.Contains(typeof(IPowerUpParser))
+                    select parser;
+                if(!definedParsers.Any())
+                    throw new MissingMemberException($"{Path.GetFileName(file)} contains no type implementing {nameof(IPowerUpParser)}");
 
-                var instance = (IPowerUpParser)Activator.CreateInstance(parser.AsType());
-                if (instance != null)
+                foreach (var parser in definedParsers)
                 {
-                    Register(instance.PowerUpId, instance);
+                    // parameterless contructor
+                    if (parser.GetConstructor(new Type[0]) == null)
+                        throw new MissingMemberException($"{parser} in {file} has no parameterless constructor!");
+
+                    var instance = (IPowerUpParser)Activator.CreateInstance(parser.AsType());
+                    if (instance != null)
+                    {
+                        Register(instance.PowerUpId, instance);
+                    }
                 }
+                
             }
         }
     }

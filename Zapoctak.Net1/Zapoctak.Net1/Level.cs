@@ -58,6 +58,7 @@ namespace ZapoctakProg2
 
         private List<Planet> planets;
         public List<Planet> Planets => planets;
+        public int PlanetCount => planets.Count;
 
         private List<PowerUp> powerUps;
         public List<PowerUp> PowerUps => powerUps;
@@ -90,7 +91,7 @@ namespace ZapoctakProg2
         /// <summary>
         /// Shown at the top - used to display level objectives and/or any additional info
         /// </summary>
-        public string Description { get; internal set; } = "Level requirements: \n";
+        public string Description { get; internal set; }
 
         private string[] goalDescriptions;
 
@@ -121,6 +122,7 @@ namespace ZapoctakProg2
             winConditions = new List<Func<Level, bool>>();
             stopwatch = new Stopwatch();
             planetCountByType = new[] { 0, 0, 0 };
+            Description = "Level requirements: \n";
 
             ReadLevelInput();
         }

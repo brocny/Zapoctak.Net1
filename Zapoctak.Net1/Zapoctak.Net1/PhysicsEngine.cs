@@ -50,7 +50,7 @@ namespace ZapoctakProg2
         {
             UpdatePlanetsAndPowerUps();
             CheckRadii();
-            CheckCrashes();
+            CheckCollisions();
             CheckDistanceFromSuns();
         }
 
@@ -147,24 +147,23 @@ namespace ZapoctakProg2
         }
 
         //checks if any of the planets have collided with a sun or another planets and destroys them if so
-        private void CheckCrashes()
+        private void CheckCollisions()
         {
 
-            CheckPowerUps();
-            //again no foreach because of removing
-            for (var i = 0; i < planets.Count; i++)
+            CheckPowerUpCollisions();
+
+            foreach (Planet planet in planets)
             {
                 foreach (var sun in suns)
                 {
-                    if (planets[i].HasCollidedWith(sun))
+                    if (planet.HasCollidedWith(sun))
                     {
-                        planets[i].IsDestroyed = true;
+                        planet.IsDestroyed = true;
                         break;
                     }
-                } 
+                }
             }
-                
-            //no foreach - removing
+
             for (var i = 0; i < planets.Count - 1; i++)
             {
                 if (planets[i].IsDestroyed) continue;
@@ -183,11 +182,11 @@ namespace ZapoctakProg2
             }
         }
 
-        private void CheckPowerUps()
+        private void CheckPowerUpCollisions()
         {
             for (var i = 0; i < powerUps.Count; i++)
             {
-                PowerUp powerUp = powerUps[i];
+                var powerUp = powerUps[i];
                 if (powerUp.IsDestroyed) continue;
                 foreach (Sun sun in suns)
                 {

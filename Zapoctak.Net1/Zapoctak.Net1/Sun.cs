@@ -27,11 +27,12 @@ namespace ZapoctakProg2
 
         private Color color;
         private Brush brush;
+        private static readonly Font MassFont = new Font(FontFamily.GenericSansSerif, 9.5f);
 
         /// <summary>
         /// Computes the color of the sun based on its temperature
         /// </summary>
-        /// <returns>Color corresponding to <code>temperature</code></returns>
+        /// <returns><code>Color</code> corresponding to <code>temperature</code></returns>
         private Color TemperatureToColor()
         {
             //algorithm to compute RGB values from absolute temperature source: http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
@@ -78,19 +79,17 @@ namespace ZapoctakProg2
             }
 
             return Color.FromArgb((int)red, (int)green, (int)blue);
-
         }
 
   
         public override void Draw(Graphics graphics, double scaleFactor)
         {
             //font used to display the mass of the sun
-            var massFont = new Font("Arial", 11.0f * (float)scaleFactor);
 
             graphics.FillEllipse(brush, (float)((xPos - radius) * scaleFactor), (float)((yPos - radius) * scaleFactor),
                 (float)(2 * radius * scaleFactor), (float)(2 * radius * scaleFactor));
 
-            graphics.DrawString(mass.ToString(CultureInfo.InvariantCulture), massFont, Brushes.Black, (float)((xPos - 3.7 * scaleFactor * mass.ToString(CultureInfo.InvariantCulture).Length) * scaleFactor), (float)((yPos - 7) * scaleFactor));
+            graphics.DrawString(mass.ToString(CultureInfo.InvariantCulture), MassFont, Brushes.Black, (float)((xPos - 3.7 * scaleFactor * mass.ToString(CultureInfo.InvariantCulture).Length) * scaleFactor), (float)((yPos - 7) * scaleFactor));
         }
 
     }

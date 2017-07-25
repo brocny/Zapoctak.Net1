@@ -8,7 +8,7 @@ namespace ZapoctakProg2
 {
     public static class ExpressionParser
     {
-        static readonly string[] ParamSeparator = new[] {"=>"};
+        static readonly string[] ParamSeparator = new[] { "=>" };
         private static readonly char[] TrimmedChars = new[] {'(', ')', ' '};
         /// <summary>
         /// Parses a single-parameter (parameter type is <code>Level</code>) lambda function in the form of a string
@@ -21,31 +21,26 @@ namespace ZapoctakProg2
             var paramName = exprParts[0].Trim(TrimmedChars);
             var body = exprParts[1];
 
-            // To allow more convenient indexing instead of e.g. PlanetCountByType[(int)Planet.PlanetType.Good] ... 
-            body = body.Replace("Good", "0");
-            body = body.Replace("Neutral", "1");
-            body = body.Replace("Bad", "2");
+            
+            // To allow more convenient indexing e.g. PlanetCountByType[Good] instead of PlanetCountByType[(int)Planet.PlanetType.Good] 
+            body = body.Replace("Good", ((int)Planet.PlanetType.Good).ToString());
+            body = body.Replace("Neutral", ((int)Planet.PlanetType.Neutral).ToString());
+            body = body.Replace("Bad", ((int)Planet.PlanetType.Bad).ToString());
 
             var param = Expression.Parameter(typeof(Level), paramName);
             var expression = System.Linq.Dynamic.DynamicExpression.ParseLambda(new[] {param}, null, body);
             return expression;
         }
-
-        /// <summary>
-        /// Generates auto-description for special cases of expression
-        /// </summary>
-        /// <param name="expr">expr to generate description from</param>
-        /// <param name="paramName">name of the parameter (expected to be level)</param>
-        /// <returns>String description of <code>expr</code> if <code>expr</code>has the correct format, null otherwise</returns>
-
+        
         private static readonly string PlanetCountByTypeName = nameof(Level.PlanetCountByType).Split('.').Last();
         private static readonly string PlanetCountName = nameof(Level.PlanetCount).Split('.').Last();
 
         private static readonly MemberInfo PlanetCountByTypeInfo = typeof(Level).GetProperty(PlanetCountByTypeName);
         private static readonly MemberInfo PlanetCountInfo = typeof(Level).GetProperty(PlanetCountName);
 
-
-
+        /// <summary>
+        /// String representations of some binary expressions
+        /// </summary>
         private static readonly Dictionary<ExpressionType, string> OperatorDict = new Dictionary<ExpressionType, string>()
         {
             {ExpressionType.Add, " + "},
@@ -62,10 +57,10 @@ namespace ZapoctakProg2
         };
 
         /// <summary>
-        /// Generate description from lambda expression
+        /// Generate description from a subset of lambda expressions
         /// </summary>
         /// <param name="lambdaExpression"><code>LambdaExpression for which to generate description</code></param>
-        /// <returns>Description of the win condition if known, <code>lambdaExpression.ToString() if uknown</code></returns>
+        /// <returns>Description of the win condition if known, <code>lambdaExpression.ToString()</code> if uknown</returns>
         public static string GenerateDescription(LambdaExpression lambdaExpression)
         {
             return GenerateDescriptionInternal(lambdaExpression.Body);
@@ -82,7 +77,10 @@ namespace ZapoctakProg2
                     var constExpr = (ConstantExpression) indExpr.Right;
                     if (memberExpr.Member == PlanetCountByTypeInfo)
                     {
-                        switch ((int)constExpr.Value)
+                        var intValue = constExpr.Value as int?;
+
+                        if (intValue != null)
+                        switch (intValue)
                         {
                             case 0:
                                 return "Good planets";
@@ -111,5 +109,7 @@ namespace ZapoctakProg2
                 }
             }
 
+            return expr.ToString();
+        } 
     }
 }

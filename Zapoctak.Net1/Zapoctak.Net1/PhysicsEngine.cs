@@ -110,40 +110,36 @@ namespace ZapoctakProg2
         //destroys planets that are not close enough to any of the suns
         private void CheckDistanceFromSuns()
         {
-            for(int i = 0; i < planets.Count; i++)
+            foreach (Planet planet in planets.Where(p => !p.IsDestroyed))
             {
-                if(planets[i].IsDestroyed) continue;
                 var numSunsCloseEnough = 0;
-                foreach (var sun in suns)
+
+                foreach (var sun in suns.Where(s => !s.IsDestroyed))
                 {
-                    if(sun.IsDestroyed) continue;
-                    if (planets[i].DistanceTo(sun) <= maxSafeDistance)
+                    if (planet.DistanceTo(sun) <= maxSafeDistance)
                         numSunsCloseEnough++;
                 }
+
                 if (numSunsCloseEnough == 0)
                 {
-                    planets[i].IsDestroyed = true;
+                    planet.IsDestroyed = true;
                 }
             }
 
-            for (int i = 0; i < powerUps.Count; i++)
+            foreach (PowerUp powerUp in powerUps.Where(p => !p.IsDestroyed))
             {
-                if(powerUps[i].IsDestroyed) continue;
                 var numSunsCloseEnough = 0;
-                foreach (var sun in suns)
+                foreach (var sun in suns.Where(p => !p.IsDestroyed))
                 {
-                    if(sun.IsDestroyed) continue;
-                    if (powerUps[i].DistanceTo(sun) <= maxSafeDistance)
+                    if (powerUp.DistanceTo(sun) <= maxSafeDistance)
                         numSunsCloseEnough++;
                 }
                 if (numSunsCloseEnough == 0)
                 {
-                    powerUps[i].ApplyTooFar(level);
-                    powerUps[i].IsDestroyed = true;
+                    powerUp.ApplyTooFar(level);
+                    powerUp.IsDestroyed = true;
                 }
-                
             }
-            
         }
 
         //checks if any of the planets have collided with a sun or another planets and destroys them if so
@@ -152,9 +148,9 @@ namespace ZapoctakProg2
 
             CheckPowerUpCollisions();
 
-            foreach (Planet planet in planets)
+            foreach (Planet planet in planets.Where(p => !p.IsDestroyed))
             {
-                foreach (var sun in suns)
+                foreach (var sun in suns.Where(s => !s.IsDestroyed))
                 {
                     if (planet.HasCollidedWith(sun))
                     {
@@ -188,9 +184,8 @@ namespace ZapoctakProg2
             {
                 var powerUp = powerUps[i];
                 if (powerUp.IsDestroyed) continue;
-                foreach (Sun sun in suns)
+                foreach (Sun sun in suns.Where(s => !s.IsDestroyed))
                 {
-                    if (sun.IsDestroyed) continue;
                     if (powerUp.HasCollidedWith(sun))
                     {
                         powerUp.ApplySun(level, sun);
@@ -199,9 +194,8 @@ namespace ZapoctakProg2
                     }
                 }
 
-                foreach (Planet planet in planets)
+                foreach (Planet planet in planets.Where(p => !p.IsDestroyed))
                 {
-                    if (planet.IsDestroyed) continue;
                     if (powerUp.HasCollidedWith(planet))
                     {
                         powerUp.ApplyPlanet(level, planet);

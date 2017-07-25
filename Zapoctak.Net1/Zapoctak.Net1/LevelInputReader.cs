@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ZapoctakProg2
 {
-    internal class LevelInputReader
+    public class LevelInputReader
     {
         private readonly StreamReader streamReader;
         private readonly Level level;
@@ -141,6 +141,12 @@ namespace ZapoctakProg2
             return coords;
         }
 
+        /// <summary>
+        /// Each record about a level requirement contains 2 lines:
+        /// 1st line: Any lambda expression C# with a single parameter of type <code>Level</code> which can be evaluated to <code>Func{Level, bool}</code>
+        /// 2nd line: An interpretation of the 1st line in natural language, will be generated for a subset of functions if this line says "auto"
+        /// </summary>
+        /// <returns>A <code>List</code> of functions to call upon level completion</returns>
         public (List<Func<Level, bool>>, string[]) ReadWinConditions()
         {
             var numConditions = int.Parse(ReadLine());
@@ -153,8 +159,9 @@ namespace ZapoctakProg2
                 var line = ReadLine();
                 var parsedExpression = ExpressionParser.Parse(line);
                 winConditions.Add((Func<Level, bool>)parsedExpression.Compile());
-                string desc;
-                if ((desc = ReadLine().ToLowerInvariant()) == "auto")
+
+                var desc = ReadLine().ToLowerInvariant();
+                if (desc == "auto" || desc == "")
                 {
                     descriptions[i] = ExpressionParser.GenerateDescription(parsedExpression);
                 }

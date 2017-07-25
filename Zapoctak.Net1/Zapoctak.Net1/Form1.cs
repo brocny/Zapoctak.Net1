@@ -28,7 +28,7 @@ namespace ZapoctakProg2
         /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
-            var form = new FormInteraction(timer1, gravityScrollBar, pictureBox1, timeLabel, textLabel);
+            var form = new FormElements(timer1, gravityScrollBar, pictureBox1, timeLabel, textLabel);
             var powerUpLoader = PowerUpPluginLoader.Instance;
             powerUpLoader.LoadPlugins();
             CurrentLevel = new Level(form, null, Level.Firstlevelpath);

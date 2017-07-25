@@ -24,8 +24,8 @@ namespace ZapoctakProg2
         private PhysicsEngine physics;
         public PhysicsEngine Physics => physics;
 
-        private FormInteraction formInteraction;
-        public FormInteraction Form => formInteraction;
+        private FormElements formElements;
+        public FormElements Form => formElements;
 
         // levels are stored in a two-way linked list
         private Level nextLevel;
@@ -38,7 +38,7 @@ namespace ZapoctakProg2
                 if (nextLevelPath == null)
                     return null;
 
-                return nextLevel ?? (nextLevel = new Level(formInteraction, this, nextLevelPath));
+                return nextLevel ?? (nextLevel = new Level(formElements, this, nextLevelPath));
             }
         }
 
@@ -105,9 +105,9 @@ namespace ZapoctakProg2
         private bool isEnded = false;
         public bool IsEnded => isEnded;
 
-        public Level(FormInteraction formInteraction, Level previousLevel, string levelPath)
+        public Level(FormElements formElements, Level previousLevel, string levelPath)
         {
-            this.formInteraction = formInteraction;
+            this.formElements = formElements;
             this.previousLevel = previousLevel;
             currentPath = levelPath;
             InitLevel();
@@ -138,17 +138,17 @@ namespace ZapoctakProg2
         //prepares this level to be played after switching to it
         public void Activate()
         {
-            formInteraction.PictureBox.Image = graphics.Bmp;
-            formInteraction.GravityScrollBar.Maximum = physics.MaxGravity;
-            formInteraction.GravityScrollBar.Minimum = physics.MinGravity;
+            formElements.PictureBox.Image = graphics.Bmp;
+            formElements.GravityScrollBar.Maximum = physics.MaxGravity;
+            formElements.GravityScrollBar.Minimum = physics.MinGravity;
 
-            formInteraction.GravityScrollBar.Value = 
-                physics.GravityConst > formInteraction.GravityScrollBar.Minimum ? 
+            formElements.GravityScrollBar.Value = 
+                physics.GravityConst > formElements.GravityScrollBar.Minimum ? 
                 physics.GravityConst : 
-                formInteraction.GravityScrollBar.Minimum;
+                formElements.GravityScrollBar.Minimum;
 
-            formInteraction.GravityScrollBar.SmallChange = (physics.MaxGravity - physics.MinGravity) / 20;
-            formInteraction.GravityScrollBar.LargeChange = (physics.MaxGravity - physics.MinGravity) / 5;
+            formElements.GravityScrollBar.SmallChange = (physics.MaxGravity - physics.MinGravity) / 20;
+            formElements.GravityScrollBar.LargeChange = (physics.MaxGravity - physics.MinGravity) / 5;
 
             graphics.Tick();
             UpdateTimeLabel();
@@ -163,16 +163,16 @@ namespace ZapoctakProg2
         //updates the label displaying remaining time, formatted to seconds with a single decimal place
         public void UpdateTimeLabel()
         {
-            formInteraction.TimeLabel.Text = (timeLimit - stopwatch.ElapsedMilliseconds / 1000.0).ToString("N1");
+            formElements.TimeLabel.Text = (timeLimit - stopwatch.ElapsedMilliseconds / 1000.0).ToString("N1");
             if (timeLimit - stopwatch.ElapsedMilliseconds / 1000 <= 0)
-                formInteraction.TimeLabel.Text = "0,0";
+                formElements.TimeLabel.Text = "0,0";
         }
 
 
         //starts this level
         public void Start()
         {
-            formInteraction.Timer.Enabled = true;
+            formElements.Timer.Enabled = true;
             stopwatch.Start();
             isRunning = true;
         }
@@ -180,7 +180,7 @@ namespace ZapoctakProg2
         //stops level running
         public void Stop()
         {
-            formInteraction.Timer.Enabled = false;
+            formElements.Timer.Enabled = false;
             stopwatch.Stop();
             isRunning = false;
         }
@@ -274,7 +274,7 @@ namespace ZapoctakProg2
     }
 
 
-    public class FormInteraction
+    public class FormElements
     {
         public Timer Timer { get; private set; }
         public ScrollBar GravityScrollBar { get; private set; }
@@ -282,7 +282,7 @@ namespace ZapoctakProg2
         public Label TimeLabel { get; private set; }
         public Label TextLabel { get; private set; }
 
-        public FormInteraction(Timer timer, ScrollBar scrollBar, PictureBox pictureBox, Label timeLabel, Label textLabel)
+        public FormElements(Timer timer, ScrollBar scrollBar, PictureBox pictureBox, Label timeLabel, Label textLabel)
         {
             Timer = timer;
             GravityScrollBar = scrollBar;

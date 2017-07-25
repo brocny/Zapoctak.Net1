@@ -33,13 +33,13 @@
 0,9
 #time limit (seconds)
 35
-#number of lose conditions
+#number of win requirements
 2
-#lose conditions
-tooFewGoodPlanets
-2
-tooManyBadPlanets
-0
+#win requirements
+level => level.PlanetCountByType[Good] >= 2
+auto
+level => level.PlanetCountByType[Bad] <= 0
+auto
 #nextlevel filename
 level4.txt
 #level description
